@@ -3,7 +3,7 @@ import Image from "next/image";
 import { CalendarDays, Clock, Coins, Layers } from "lucide-react";
 import type { Event } from "@/lib/schemas/event";
 import { Badge } from "@/components/ui/Badge";
-import { formatDateIt, formatEuro } from "@/lib/utils";
+import { formatDateIt, formatEuro, formatNumberIt } from "@/lib/utils";
 
 export function EventCard({ event, priority = false }: { event: Event; priority?: boolean }) {
   return (
@@ -55,7 +55,7 @@ export function EventCard({ event, priority = false }: { event: Event; priority?
             <div className="text-muted text-xs uppercase tracking-wide">Stack iniziale</div>
             <div className="text-foreground font-medium flex items-center gap-1">
               <Layers size={13} className="text-gold" />
-              {event.startingStack.toLocaleString("it-IT")}
+              {formatNumberIt(event.startingStack)}
             </div>
           </div>
           {event.guaranteed ? (

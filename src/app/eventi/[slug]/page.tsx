@@ -7,7 +7,7 @@ import { getEventBySlug, getEvents } from "@/lib/data/events";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { formatDateIt, formatEuro } from "@/lib/utils";
+import { formatDateIt, formatEuro, formatNumberIt } from "@/lib/utils";
 
 export function generateStaticParams() {
   return getEvents().map((event) => ({ slug: event.slug }));
@@ -46,7 +46,7 @@ export default async function EventoPage({
     { icon: CalendarDays, label: "Data", value: formatDateIt(event.date) },
     { icon: Clock, label: "Orario", value: event.time },
     { icon: Coins, label: "Buy-in", value: formatEuro(event.buyIn) },
-    { icon: Layers, label: "Stack iniziale", value: event.startingStack.toLocaleString("it-IT") },
+    { icon: Layers, label: "Stack iniziale", value: formatNumberIt(event.startingStack) },
   ];
 
   return (
@@ -149,9 +149,9 @@ export default async function EventoPage({
                   {event.structure.map((level) => (
                     <tr key={level.level} className="border-t border-border-subtle">
                       <td className="px-4 py-3 text-gold-light">{level.level}</td>
-                      <td className="px-4 py-3">{level.smallBlind.toLocaleString("it-IT")}</td>
-                      <td className="px-4 py-3">{level.bigBlind.toLocaleString("it-IT")}</td>
-                      <td className="px-4 py-3">{level.ante ? level.ante.toLocaleString("it-IT") : "—"}</td>
+                      <td className="px-4 py-3">{formatNumberIt(level.smallBlind)}</td>
+                      <td className="px-4 py-3">{formatNumberIt(level.bigBlind)}</td>
+                      <td className="px-4 py-3">{level.ante ? formatNumberIt(level.ante) : "—"}</td>
                       <td className="px-4 py-3">{level.duration} min</td>
                     </tr>
                   ))}
