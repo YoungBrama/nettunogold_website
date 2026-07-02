@@ -1,0 +1,21 @@
+import type { Event } from "@/lib/schemas/event";
+
+const event: Event = {
+  title: "Rebuy Domenicale",
+  slug: "rebuy-domenicale-19-07",
+  date: "2026-07-19",
+  time: "18:00",
+  format: "Rebuy",
+  buyIn: 35,
+  fee: 5,
+  startingStack: 10000,
+  guaranteed: 800,
+  series: null,
+  description:
+    "Un'ora di rebuy illimitato per costruire lo stack che vuoi, poi via verso il tavolo finale. Formato amato dai soci per l'azione garantita fin dai primi livelli.",
+  image: "/eventi/placeholder-torneo.svg",
+  lateRegistration: "Fino al livello 8 (circa le 21:00)",
+  structure: null,
+};
+
+export default event;

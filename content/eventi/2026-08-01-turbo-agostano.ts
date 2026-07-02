@@ -1,0 +1,21 @@
+import type { Event } from "@/lib/schemas/event";
+
+const event: Event = {
+  title: "Turbo Agostano",
+  slug: "turbo-agostano-01-08",
+  date: "2026-08-01",
+  time: "20:00",
+  format: "Turbo",
+  buyIn: 25,
+  fee: 5,
+  startingStack: 8000,
+  guaranteed: null,
+  series: null,
+  description:
+    "Livelli veloci, azione immediata: il torneo turbo perfetto per una serata d'agosto in cui non si vuole rinunciare al proprio appuntamento con il poker.",
+  image: "/eventi/placeholder-torneo.svg",
+  lateRegistration: "Fino al livello 5 (circa le 21:00)",
+  structure: null,
+};
+
+export default event;

@@ -1,0 +1,16 @@
+<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Immagine segnaposto news Nettuno Gold">
+  <defs>
+    <linearGradient id="gold2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8C6A1D"/>
+      <stop offset="50%" stop-color="#C9A227"/>
+      <stop offset="100%" stop-color="#F0C75E"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="#141414"/>
+  <g opacity="0.3" stroke="url(#gold2)" stroke-width="1.5" fill="none">
+    <path d="M-20 440 Q 80 415 180 440 T 380 440 T 580 440 T 780 440 T 980 440" />
+    <path d="M-20 465 Q 80 440 180 465 T 380 465 T 580 465 T 780 465 T 980 465" />
+  </g>
+  <text x="400" y="260" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="34" letter-spacing="4" fill="url(#gold2)">NETTUNO GOLD</text>
+  <text x="400" y="292" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" letter-spacing="5" fill="#9A948A">NEWS &amp; RISULTATI</text>
+</svg>
