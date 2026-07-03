@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+import { PageHero } from "@/components/sections/PageHero";
 
 export const metadata: Metadata = {
   title: "Regolamento Classifiche",
@@ -28,28 +28,29 @@ const rules = [
 
 export default function RegolamentoPage() {
   return (
-    <div className="py-16 md:py-24">
-      <Container className="flex flex-col gap-10">
-        <SectionHeading
-          eyebrow="Classifiche"
-          title="Regolamento"
-          subtitle="Le regole generali di assegnazione punteggio per le classifiche di Nettuno Gold."
-        />
+    <>
+      <PageHero
+        eyebrow="Classifiche"
+        title="Regolamento"
+        subtitle="Le regole generali di assegnazione punteggio per le classifiche di Nettuno Gold."
+      />
+      <div className="py-16 md:py-24">
+        <Container className="flex flex-col gap-10">
+          <div className="flex flex-col gap-6">
+            {rules.map((rule) => (
+              <div key={rule.title} className="rounded-lg border border-border-subtle bg-surface p-6">
+                <h2 className="font-display text-xl text-gold-light">{rule.title}</h2>
+                <p className="mt-2 text-sm text-muted leading-relaxed">{rule.text}</p>
+              </div>
+            ))}
+          </div>
 
-        <div className="flex flex-col gap-6">
-          {rules.map((rule) => (
-            <div key={rule.title} className="rounded-lg border border-border-subtle bg-surface p-6">
-              <h2 className="font-display text-xl text-gold-light">{rule.title}</h2>
-              <p className="mt-2 text-sm text-muted leading-relaxed">{rule.text}</p>
-            </div>
-          ))}
-        </div>
-
-        <p className="text-xs text-muted">
-          Contenuto segnaposto: il regolamento definitivo va confermato con lo staff del
-          circolo e sostituito con il testo ufficiale.
-        </p>
-      </Container>
-    </div>
+          <p className="text-xs text-muted">
+            Contenuto segnaposto: il regolamento definitivo va confermato con lo staff del
+            circolo e sostituito con il testo ufficiale.
+          </p>
+        </Container>
+      </div>
+    </>
   );
 }

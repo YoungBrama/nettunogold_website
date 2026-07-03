@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { MapPin, Phone, Mail, MessageCircle, Clock } from "lucide-react";
 import { Container } from "@/components/ui/Container";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+import { PageHero } from "@/components/sections/PageHero";
 import { InstagramIcon, FacebookIcon } from "@/components/icons/SocialIcons";
 import { businessInfo } from "@/lib/site-config";
 
@@ -13,14 +13,14 @@ export const metadata: Metadata = {
 
 export default function ContattiPage() {
   return (
-    <div className="py-16 md:py-24">
+    <>
+      <PageHero
+        eyebrow="Contatti"
+        title="Dove siamo"
+        subtitle="Siamo a Villanova di Castenaso, a pochi minuti da Bologna. Scrivici o vieni a trovarci."
+      />
+      <div className="py-16 md:py-24">
       <Container className="flex flex-col gap-12">
-        <SectionHeading
-          eyebrow="Contatti"
-          title="Dove siamo"
-          subtitle="Siamo a Villanova di Castenaso, a pochi minuti da Bologna. Scrivici o vieni a trovarci."
-        />
-
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-5">
           <div className="overflow-hidden rounded-lg border border-border-subtle lg:col-span-3">
             <iframe
@@ -94,7 +94,8 @@ export default function ContattiPage() {
           </div>
         </div>
       </Container>
-    </div>
+      </div>
+    </>
   );
 }
 

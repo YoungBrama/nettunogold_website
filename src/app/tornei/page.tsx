@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getUpcomingEvents, getEventFormats, getEventSeries } from "@/lib/data/events";
 import { Container } from "@/components/ui/Container";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+import { PageHero } from "@/components/sections/PageHero";
 import { TorneiExplorer } from "@/components/events/TorneiExplorer";
 
 export const metadata: Metadata = {
@@ -16,15 +16,17 @@ export default function TorneiPage() {
   const series = getEventSeries();
 
   return (
-    <div className="py-16 md:py-24">
-      <Container className="flex flex-col gap-12">
-        <SectionHeading
-          eyebrow="Calendario"
-          title="Tornei"
-          subtitle="Tutti i prossimi appuntamenti in sala, con dati strutturati a colpo d'occhio. Filtra per formato, serie o buy-in, oppure sfoglia il calendario mensile."
-        />
-        <TorneiExplorer events={events} formats={formats} series={series} />
-      </Container>
-    </div>
+    <>
+      <PageHero
+        eyebrow="Calendario"
+        title="Tornei"
+        subtitle="Tutti i prossimi appuntamenti in sala, con dati strutturati a colpo d'occhio. Filtra per formato, serie o buy-in, oppure sfoglia il calendario mensile."
+      />
+      <div className="py-16 md:py-24">
+        <Container className="flex flex-col gap-12">
+          <TorneiExplorer events={events} formats={formats} series={series} />
+        </Container>
+      </div>
+    </>
   );
 }

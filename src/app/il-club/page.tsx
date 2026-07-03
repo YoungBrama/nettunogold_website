@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Trophy, Target, Users2, ShieldCheck } from "lucide-react";
 import { Container } from "@/components/ui/Container";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+import { PageHero } from "@/components/sections/PageHero";
 import { GoldDivider } from "@/components/ui/GoldDivider";
 import { businessInfo } from "@/lib/site-config";
 
@@ -69,14 +69,14 @@ const staffRoles = [
 
 export default function IlClubPage() {
   return (
-    <div className="py-16 md:py-24">
+    <>
+      <PageHero
+        eyebrow="Dal 2007"
+        title="Il Club"
+        subtitle="La storia, la mission e le persone che ogni giorno rendono Nettuno Gold un punto di riferimento per il poker a Bologna."
+      />
+      <div className="py-16 md:py-24">
       <Container className="flex flex-col gap-20">
-        <SectionHeading
-          eyebrow="Dal 2007"
-          title="Il Club"
-          subtitle="La storia, la mission e le persone che ogni giorno rendono Nettuno Gold un punto di riferimento per il poker a Bologna."
-        />
-
         {/* Storia */}
         <div className="flex flex-col gap-8">
           <h2 className="font-display text-2xl md:text-3xl text-gold-gradient">La nostra storia</h2>
@@ -124,6 +124,7 @@ export default function IlClubPage() {
           </div>
         </div>
       </Container>
-    </div>
+      </div>
+    </>
   );
 }

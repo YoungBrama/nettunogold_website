@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getRankings } from "@/lib/data/rankings";
 import { Container } from "@/components/ui/Container";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+import { PageHero } from "@/components/sections/PageHero";
 import { Button } from "@/components/ui/Button";
 import { formatDateIt } from "@/lib/utils";
 
@@ -15,14 +15,14 @@ export default function ClassifichePage() {
   const rankings = getRankings();
 
   return (
-    <div className="py-16 md:py-24">
+    <>
+      <PageHero
+        eyebrow="Soci"
+        title="Classifiche"
+        subtitle="Classifica della serie in corso e classifica generale annuale, aggiornate dopo ogni tornei valido."
+      />
+      <div className="py-16 md:py-24">
       <Container className="flex flex-col gap-14">
-        <SectionHeading
-          eyebrow="Soci"
-          title="Classifiche"
-          subtitle="Classifica della serie in corso e classifica generale annuale, aggiornate dopo ogni tornei valido."
-        />
-
         {rankings.map((ranking) => (
           <div key={ranking.slug} className="flex flex-col gap-4">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -74,6 +74,7 @@ export default function ClassifichePage() {
           </Button>
         </div>
       </Container>
-    </div>
+      </div>
+    </>
   );
 }

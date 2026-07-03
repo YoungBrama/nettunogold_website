@@ -13,6 +13,9 @@
   --foreground: #f5f0e6;
   --muted: #9a948a;
 
+  /* Rotaia del tavolo da gioco (rif. foto tavolo Nettuno Gold) */
+  --felt-rail: #302c24;
+
   --font-display: var(--font-cormorant);
   --font-body: var(--font-inter);
 }
@@ -29,6 +32,7 @@
 
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
+  --color-felt-rail: var(--felt-rail);
 
   --font-display: var(--font-display);
   --font-sans: var(--font-body);

@@ -18,9 +18,9 @@ export function Footer() {
               <Image
                 src="/logo/nettuno-gold-emblem-180.png"
                 alt="Emblema Nettuno Gold"
-                width={40}
-                height={40}
-                className="h-10 w-10"
+                width={180}
+                height={202}
+                className="h-11 w-auto"
               />
               <span className="font-display text-xl text-gold-gradient">
                 NETTUNO GOLD

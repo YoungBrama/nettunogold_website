@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getNews } from "@/lib/data/news";
 import { Container } from "@/components/ui/Container";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+import { PageHero } from "@/components/sections/PageHero";
 import { Badge } from "@/components/ui/Badge";
 import { formatDateIt } from "@/lib/utils";
 
@@ -16,14 +16,14 @@ export default function NewsPage() {
   const news = getNews();
 
   return (
-    <div className="py-16 md:py-24">
+    <>
+      <PageHero
+        eyebrow="Il club"
+        title="News &amp; Risultati"
+        subtitle="Vincitori, chip count e comunicati direttamente dalla sala."
+      />
+      <div className="py-16 md:py-24">
       <Container className="flex flex-col gap-12">
-        <SectionHeading
-          eyebrow="Il club"
-          title="News &amp; Risultati"
-          subtitle="Vincitori, chip count e comunicati direttamente dalla sala."
-        />
-
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {news.map((post) => (
             <Link
@@ -54,6 +54,7 @@ export default function NewsPage() {
           ))}
         </div>
       </Container>
-    </div>
+      </div>
+    </>
   );
 }

@@ -9,9 +9,9 @@ export default function NotFound() {
         <Image
           src="/logo/nettuno-gold-emblem-180.png"
           alt="Emblema Nettuno Gold"
-          width={90}
-          height={90}
-          className="h-20 w-20 opacity-80"
+          width={180}
+          height={202}
+          className="h-20 w-auto opacity-80"
         />
         <span className="font-display text-6xl text-gold-gradient">404</span>
         <h1 className="font-display text-2xl md:text-3xl text-foreground">

@@ -34,9 +34,9 @@ export function Header() {
           <Image
             src="/logo/nettuno-gold-emblem-180.png"
             alt="Emblema Nettuno Gold"
-            width={44}
-            height={44}
-            className="h-10 w-10 md:h-11 md:w-11"
+            width={180}
+            height={202}
+            className="h-11 w-auto md:h-12"
             priority
           />
           <span className="font-display text-xl md:text-2xl tracking-wide text-gold-gradient">
