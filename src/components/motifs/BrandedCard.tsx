@@ -1,37 +1,26 @@
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
-// Dorso di carta da gioco brandizzato Nettuno Gold: doppia cornice a filo
-// oro e monogramma centrale, nello stesso stile inciso del logo.
+// Dorso di carta da gioco brandizzato: il vero emblema Nettuno Gold
+// stampato al centro, con doppia cornice a filo oro.
 export function BrandedCard({ className }: { className?: string }) {
   return (
-    <svg
-      viewBox="0 0 200 280"
-      className={cn("h-full w-full", className)}
-      aria-hidden="true"
+    <div
+      className={cn(
+        "relative aspect-[2/3] w-full rounded-[10%] border border-gold/80 bg-surface shadow-[0_4px_24px_rgba(0,0,0,0.5)]",
+        className
+      )}
     >
-      <rect x="2" y="2" width="196" height="276" rx="14" className="fill-surface" stroke="var(--gold)" strokeWidth="2" />
-      <rect x="14" y="14" width="172" height="252" rx="8" fill="none" stroke="var(--gold)" strokeWidth="1" opacity="0.6" />
-
-      {/* Monogramma centrale */}
-      <g transform="translate(100 140)">
-        <rect x="-34" y="-34" width="68" height="68" rx="4" fill="none" stroke="var(--gold)" strokeWidth="1.25" transform="rotate(45)" />
-        <text
-          x="0"
-          y="10"
-          textAnchor="middle"
-          fontFamily="var(--font-display)"
-          fontSize="34"
-          fill="var(--gold)"
-        >
-          N
-        </text>
-      </g>
-
-      {/* Indici agli angoli */}
-      <g fill="var(--gold)" opacity="0.85">
-        <text x="20" y="34" fontFamily="var(--font-display)" fontSize="16">NG</text>
-        <text x="180" y="258" fontFamily="var(--font-display)" fontSize="16" textAnchor="end" transform="rotate(180 180 258)">NG</text>
-      </g>
-    </svg>
+      <div className="absolute inset-[6%] rounded-[8%] border border-gold/35" />
+      <div className="absolute inset-0 flex items-center justify-center p-[18%]">
+        <Image
+          src="/logo/nettuno-gold-emblem-180.png"
+          alt=""
+          width={180}
+          height={202}
+          className="h-auto w-full opacity-95"
+        />
+      </div>
+    </div>
   );
 }

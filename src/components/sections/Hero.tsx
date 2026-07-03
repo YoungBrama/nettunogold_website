@@ -5,18 +5,15 @@ import Image from "next/image";
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
-import { PokerTableMotif } from "@/components/motifs/PokerTableMotif";
-import { BrandedCard } from "@/components/motifs/BrandedCard";
-import { ChipStack } from "@/components/motifs/ChipStack";
+import { FallingHeroField } from "@/components/sections/FallingHeroField";
 
-// La hero mette in scena il tavolo verde... nero e oro: il panno del
-// circolo (rif. disegno tavolo reale) come sfondo atmosferico, con carte
-// e fiches brandizzate ai bordi. Allo scroll il tavolo si allontana in
-// parallasse, le carte vengono "spazzate via" e il contenuto si dissolve
-// dolcemente, come un mazzo che chiude la mano.
+// Sfondo hero: carte e fiches brandizzate (col vero emblema del circolo)
+// cadono lentamente ai lati, restando sempre dietro logo e nome, che sono
+// il fuoco della composizione. Allo scroll, il campo accelera leggermente
+// e il contenuto si dissolve, come un mazzo che chiude la mano.
 export function Hero() {
   const heroRef = useRef<HTMLElement>(null);
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = Boolean(useReducedMotion());
 
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -25,73 +22,27 @@ export function Hero() {
 
   const d = reduceMotion ? 0 : 1;
 
-  const tableY = useTransform(scrollYProgress, [0, 1], [0, 140 * d]);
-  const tableScale = useTransform(scrollYProgress, [0, 1], [1, 1 + 0.12 * d]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 1 - 0.85 * d]);
   const contentY = useTransform(scrollYProgress, [0, 1], [0, -60 * d]);
-
-  const cardTopLeftY = useTransform(scrollYProgress, [0, 1], [0, -180 * d]);
-  const cardTopLeftRotate = useTransform(scrollYProgress, [0, 1], [-14, -46 * d - 14]);
-  const cardTopRightY = useTransform(scrollYProgress, [0, 1], [0, -220 * d]);
-  const cardTopRightRotate = useTransform(scrollYProgress, [0, 1], [12, 12 + 50 * d]);
-  const chipLeftY = useTransform(scrollYProgress, [0, 1], [0, 160 * d]);
-  const chipRightY = useTransform(scrollYProgress, [0, 1], [0, 190 * d]);
+  const haloRotate = useTransform(scrollYProgress, [0, 1], [0, 25 * d]);
 
   return (
     <section
       ref={heroRef}
       className="relative flex min-h-[100svh] items-center overflow-hidden bg-background"
     >
-      {/* Panno del tavolo: texture d'atmosfera, ingrandita e tagliata ai bordi */}
-      <motion.div
-        aria-hidden="true"
-        style={{ y: tableY, scale: tableScale }}
-        className="pointer-events-none absolute inset-[-12%] opacity-[0.4] sm:opacity-[0.5]"
-      >
-        <PokerTableMotif />
-      </motion.div>
+      {/* Campo di carte e fiches brandizzate, in caduta lenta */}
+      <FallingHeroField scrollYProgress={scrollYProgress} reduceMotion={reduceMotion} />
 
-      {/* Vignettatura per leggibilità del contenuto sopra il tavolo */}
+      {/* Vignettatura: scurisce i bordi e protegge la leggibilità al centro */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_38%,rgba(10,10,10,0.35),rgba(10,10,10,0.92)_72%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_42%,rgba(10,10,10,0.55)_0%,rgba(10,10,10,0.7)_38%,rgba(10,10,10,0.97)_78%)]"
       />
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background to-transparent"
       />
-
-      {/* Carte brandizzate, in bilico sul bordo del tavolo */}
-      <motion.div
-        aria-hidden="true"
-        style={{ y: cardTopLeftY, rotate: cardTopLeftRotate }}
-        className="pointer-events-none absolute left-[4%] top-[14%] hidden w-20 opacity-70 sm:block md:w-24 lg:left-[8%]"
-      >
-        <BrandedCard />
-      </motion.div>
-      <motion.div
-        aria-hidden="true"
-        style={{ y: cardTopRightY, rotate: cardTopRightRotate }}
-        className="pointer-events-none absolute right-[5%] top-[20%] hidden w-16 opacity-60 sm:block md:w-20 lg:right-[10%]"
-      >
-        <BrandedCard />
-      </motion.div>
-
-      {/* Fiches, appoggiate ai bordi inferiori */}
-      <motion.div
-        aria-hidden="true"
-        style={{ y: chipLeftY }}
-        className="pointer-events-none absolute bottom-[8%] left-[6%] hidden w-16 opacity-60 md:block lg:left-[11%] lg:w-20"
-      >
-        <ChipStack />
-      </motion.div>
-      <motion.div
-        aria-hidden="true"
-        style={{ y: chipRightY }}
-        className="pointer-events-none absolute bottom-[10%] right-[4%] hidden w-14 opacity-50 md:block lg:right-[9%] lg:w-[4.5rem]"
-      >
-        <ChipStack count={4} />
-      </motion.div>
 
       <motion.div style={{ opacity: contentOpacity, y: contentY }} className="relative z-10 w-full">
         <Container className="flex flex-col items-center gap-8 py-24 text-center">
@@ -99,14 +50,43 @@ export function Hero() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: "easeOut" }}
+            className="relative flex items-center justify-center"
           >
+            {/* Alone: anello sottile che ruota lentamente dietro l'emblema */}
+            <motion.svg
+              aria-hidden="true"
+              viewBox="0 0 200 200"
+              style={{ rotate: haloRotate }}
+              className="absolute h-52 w-52 sm:h-64 sm:w-64"
+            >
+              <circle
+                cx="100"
+                cy="100"
+                r="94"
+                fill="none"
+                stroke="var(--gold)"
+                strokeWidth="1"
+                strokeDasharray="2 10"
+                opacity="0.55"
+              />
+              <circle
+                cx="100"
+                cy="100"
+                r="84"
+                fill="none"
+                stroke="var(--gold-light)"
+                strokeWidth="0.75"
+                opacity="0.35"
+              />
+            </motion.svg>
+
             <Image
               src="/logo/nettuno-gold-emblem-400.png"
               alt="Emblema Nettuno Gold: Nettuno con tridente in un cerchio dorato"
               width={400}
               height={450}
               priority
-              className="h-40 w-auto sm:h-52 drop-shadow-[0_0_40px_rgba(201,162,39,0.25)]"
+              className="relative z-10 h-40 w-auto sm:h-52 drop-shadow-[0_0_50px_rgba(240,199,94,0.35)]"
             />
           </motion.div>
 
