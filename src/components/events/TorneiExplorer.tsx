@@ -10,46 +10,21 @@ import { cn, formatDateIt, formatEuro } from "@/lib/utils";
 import { EventCard } from "@/components/events/EventCard";
 import { Badge } from "@/components/ui/Badge";
 
-const BUYIN_RANGES = [
-  { value: "all", label: "Tutti i buy-in" },
-  { value: "low", label: "Fino a 30€" },
-  { value: "mid", label: "31€ – 80€" },
-  { value: "high", label: "Oltre 80€" },
-] as const;
-
-type BuyInRange = (typeof BUYIN_RANGES)[number]["value"];
-
-function matchesBuyIn(buyIn: number, range: BuyInRange) {
-  if (range === "all") return true;
-  if (range === "low") return buyIn <= 30;
-  if (range === "mid") return buyIn > 30 && buyIn <= 80;
-  return buyIn > 80;
-}
-
 export function TorneiExplorer({
   events,
   formats,
-  series,
 }: {
   events: Event[];
   formats: string[];
-  series: string[];
 }) {
   const [format, setFormat] = useState<string>("all");
-  const [serie, setSerie] = useState<string>("all");
-  const [buyInRange, setBuyInRange] = useState<BuyInRange>("all");
-  const [view, setView] = useState<"calendario" | "lista">("calendario");
+  const [view, setView] = useState<"calendario" | "lista">("lista");
   const [month, setMonth] = useState<Date>(() => new Date());
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
-    return events.filter((event) => {
-      if (format !== "all" && event.format !== format) return false;
-      if (serie !== "all" && event.series !== serie) return false;
-      if (!matchesBuyIn(event.buyIn, buyInRange)) return false;
-      return true;
-    });
-  }, [events, format, serie, buyInRange]);
+    return events.filter((event) => format === "all" || event.format === format);
+  }, [events, format]);
 
   const eventsByDay = useMemo(() => {
     const map = new Map<string, Event[]>();
@@ -64,55 +39,18 @@ export function TorneiExplorer({
   const monthDays = useMemo(() => buildMonthGrid(month), [month]);
   const selectedDayEvents = selectedDay ? (eventsByDay.get(selectedDay) ?? []) : [];
 
-  const groupedByDate = useMemo(() => {
-    const groups: { date: string; events: Event[] }[] = [];
-    for (const event of filtered) {
-      const last = groups[groups.length - 1];
-      if (last && last.date === event.date) {
-        last.events.push(event);
-      } else {
-        groups.push({ date: event.date, events: [event] });
-      }
-    }
-    return groups;
-  }, [filtered]);
-
   return (
     <div className="flex flex-col gap-10">
       {/* Filtri */}
-      <div className="flex flex-wrap gap-3 rounded-lg border border-border-subtle bg-surface p-4">
+      <div className="flex flex-wrap items-end gap-3 rounded-lg border border-border-subtle bg-surface p-4">
         <FilterSelect
           label="Formato"
           value={format}
           onChange={setFormat}
           options={[{ value: "all", label: "Tutti i formati" }, ...formats.map((f) => ({ value: f, label: f }))]}
         />
-        {series.length > 0 && (
-          <FilterSelect
-            label="Serie"
-            value={serie}
-            onChange={setSerie}
-            options={[{ value: "all", label: "Tutte le serie" }, ...series.map((s) => ({ value: s, label: s }))]}
-          />
-        )}
-        <FilterSelect
-          label="Buy-in"
-          value={buyInRange}
-          onChange={(v) => setBuyInRange(v as BuyInRange)}
-          options={BUYIN_RANGES.map((r) => ({ value: r.value, label: r.label }))}
-        />
 
         <div className="ml-auto hidden items-center gap-1 rounded-full border border-border-subtle p-1 lg:flex">
-          <button
-            type="button"
-            onClick={() => setView("calendario")}
-            className={cn(
-              "flex items-center gap-1.5 rounded-full px-4 py-2 text-xs uppercase tracking-widest transition-colors",
-              view === "calendario" ? "bg-gold-gradient text-background" : "text-muted hover:text-gold"
-            )}
-          >
-            <CalendarDays size={14} /> Calendario
-          </button>
           <button
             type="button"
             onClick={() => setView("lista")}
@@ -122,6 +60,16 @@ export function TorneiExplorer({
             )}
           >
             <List size={14} /> Lista
+          </button>
+          <button
+            type="button"
+            onClick={() => setView("calendario")}
+            className={cn(
+              "flex items-center gap-1.5 rounded-full px-4 py-2 text-xs uppercase tracking-widest transition-colors",
+              view === "calendario" ? "bg-gold-gradient text-background" : "text-muted hover:text-gold"
+            )}
+          >
+            <CalendarDays size={14} /> Calendario
           </button>
         </div>
       </div>
@@ -232,23 +180,17 @@ export function TorneiExplorer({
         </div>
       )}
 
-      {/* Vista lista / agenda: sempre visibile su mobile, opzionale su desktop */}
-      <div className={cn("flex flex-col gap-10", view === "calendario" && "lg:hidden")}>
-        {groupedByDate.length === 0 && (
+      {/* Vista lista: griglia unica su tutti i tornei filtrati, sempre visibile su mobile */}
+      <div className={cn("flex flex-col gap-6", view === "calendario" && "lg:hidden")}>
+        {filtered.length === 0 ? (
           <p className="text-center text-muted">Nessun torneo trovato con questi filtri.</p>
-        )}
-        {groupedByDate.map((group) => (
-          <div key={group.date} className="flex flex-col gap-4">
-            <h3 className="font-display text-xl capitalize text-gold-light">
-              {formatDateIt(group.date)}
-            </h3>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {group.events.map((event) => (
-                <EventCard key={event.slug} event={event} />
-              ))}
-            </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {filtered.map((event) => (
+              <EventCard key={event.slug} event={event} />
+            ))}
           </div>
-        ))}
+        )}
       </div>
     </div>
   );

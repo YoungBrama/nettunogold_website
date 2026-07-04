@@ -54,12 +54,3 @@ export function getEventFormats(): Event["format"][] {
   const formats = new Set(parseAllEvents().map((event) => event.format));
   return Array.from(formats);
 }
-
-export function getEventSeries(): string[] {
-  const series = new Set(
-    parseAllEvents()
-      .map((event) => event.series)
-      .filter((s): s is string => Boolean(s))
-  );
-  return Array.from(series);
-}
