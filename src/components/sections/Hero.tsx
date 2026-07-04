@@ -5,12 +5,11 @@ import Image from "next/image";
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
-import { FallingHeroField } from "@/components/sections/FallingHeroField";
+import { GoldParticles } from "@/components/sections/GoldParticles";
 
-// Sfondo hero: carte e fiches brandizzate (col vero emblema del circolo)
-// cadono lentamente ai lati, restando sempre dietro logo e nome, che sono
-// il fuoco della composizione. Allo scroll, il campo accelera leggermente
-// e il contenuto si dissolve, come un mazzo che chiude la mano.
+// Hero essenziale: sfondo scuro pieno, un pulviscolo dorato raccolto
+// attorno all'emblema, e logo/nome sempre il fuoco assoluto della
+// composizione, senza altro a competere con loro.
 export function Hero() {
   const heroRef = useRef<HTMLElement>(null);
   const reduceMotion = Boolean(useReducedMotion());
@@ -24,21 +23,12 @@ export function Hero() {
 
   const contentOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 1 - 0.85 * d]);
   const contentY = useTransform(scrollYProgress, [0, 1], [0, -60 * d]);
-  const haloRotate = useTransform(scrollYProgress, [0, 1], [0, 25 * d]);
 
   return (
     <section
       ref={heroRef}
       className="relative flex min-h-[100svh] items-center overflow-hidden bg-background"
     >
-      {/* Campo di carte e fiches brandizzate, in caduta lenta */}
-      <FallingHeroField scrollYProgress={scrollYProgress} reduceMotion={reduceMotion} />
-
-      {/* Vignettatura: scurisce i bordi e protegge la leggibilità al centro */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_42%,rgba(10,10,10,0.55)_0%,rgba(10,10,10,0.7)_38%,rgba(10,10,10,0.97)_78%)]"
-      />
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background to-transparent"
@@ -52,33 +42,7 @@ export function Hero() {
             transition={{ duration: 0.7, ease: "easeOut" }}
             className="relative flex items-center justify-center"
           >
-            {/* Alone: anello sottile che ruota lentamente dietro l'emblema */}
-            <motion.svg
-              aria-hidden="true"
-              viewBox="0 0 200 200"
-              style={{ rotate: haloRotate }}
-              className="absolute h-52 w-52 sm:h-64 sm:w-64"
-            >
-              <circle
-                cx="100"
-                cy="100"
-                r="94"
-                fill="none"
-                stroke="var(--gold)"
-                strokeWidth="1"
-                strokeDasharray="2 10"
-                opacity="0.55"
-              />
-              <circle
-                cx="100"
-                cy="100"
-                r="84"
-                fill="none"
-                stroke="var(--gold-light)"
-                strokeWidth="0.75"
-                opacity="0.35"
-              />
-            </motion.svg>
+            <GoldParticles reduceMotion={reduceMotion} />
 
             <Image
               src="/logo/nettuno-gold-emblem-400.png"
@@ -86,7 +50,7 @@ export function Hero() {
               width={400}
               height={450}
               priority
-              className="relative z-10 h-40 w-auto sm:h-52 drop-shadow-[0_0_50px_rgba(240,199,94,0.35)]"
+              className="relative z-10 h-40 w-auto sm:h-52 drop-shadow-[0_0_40px_rgba(201,162,39,0.25)]"
             />
           </motion.div>
 
