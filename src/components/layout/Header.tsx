@@ -40,7 +40,7 @@ export function Header() {
             priority
           />
           <span className="font-display text-xl md:text-2xl tracking-wide text-gold-gradient">
-            NETTUNO <span className="text-foreground/90">GOLD</span>
+            NETTUNO GOLD
           </span>
         </Link>
 
