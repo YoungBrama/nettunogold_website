@@ -7,6 +7,7 @@ import { addMonths, subMonths } from "date-fns";
 import type { Event } from "@/lib/schemas/event";
 import { buildMonthGrid, isoDate, monthLabel, isSameMonth, isSameDay } from "@/lib/calendar";
 import { cn, formatDateIt, formatEuro } from "@/lib/utils";
+import { getTagColorClasses } from "@/lib/tagColors";
 import { EventCard } from "@/components/events/EventCard";
 import { Badge } from "@/components/ui/Badge";
 
@@ -120,7 +121,7 @@ export function TorneiExplorer({
                   key={iso}
                   onClick={() => dayEvents.length > 0 && setSelectedDay(selected ? null : iso)}
                   className={cn(
-                    "flex min-h-[104px] flex-col items-start gap-1 border-b border-r border-border-subtle p-2 text-left transition-colors last:border-r-0",
+                    "flex min-h-[122px] flex-col items-start gap-1.5 border-b border-r border-border-subtle p-2 text-left transition-colors last:border-r-0",
                     inMonth ? "bg-background" : "bg-background/40",
                     dayEvents.length > 0 && "cursor-pointer hover:bg-gold/5",
                     selected && "bg-gold/10 ring-1 ring-inset ring-gold/50"
@@ -135,18 +136,25 @@ export function TorneiExplorer({
                   >
                     {day.getDate()}
                   </span>
-                  <div className="flex w-full flex-col gap-1">
-                    {dayEvents.slice(0, 2).map((event) => (
-                      <span
-                        key={event.slug}
-                        className="truncate rounded bg-gold/15 px-1.5 py-0.5 text-[10px] leading-tight text-gold-light"
-                        title={event.title}
-                      >
-                        {event.title}
-                      </span>
-                    ))}
+                  <div className="flex w-full flex-col gap-1.5">
+                    {dayEvents.slice(0, 2).map((event) => {
+                      const colors = getTagColorClasses(event.format);
+                      return (
+                        <span
+                          key={event.slug}
+                          className={cn(
+                            "truncate rounded px-2 py-1 text-xs font-medium leading-tight",
+                            colors.bg,
+                            colors.text
+                          )}
+                          title={event.title}
+                        >
+                          {event.title}
+                        </span>
+                      );
+                    })}
                     {dayEvents.length > 2 && (
-                      <span className="text-[10px] text-muted">+{dayEvents.length - 2} altri</span>
+                      <span className="text-xs text-muted">+{dayEvents.length - 2} altri</span>
                     )}
                   </div>
                 </button>

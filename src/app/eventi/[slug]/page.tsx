@@ -121,10 +121,7 @@ export default async function EventoPage({
             )}
 
             <div className="flex flex-col gap-3 sm:flex-row">
-              <Button href="/contatti" size="lg">
-                Prenota il tuo posto
-              </Button>
-              <Button href="/tornei" variant="secondary" size="lg">
+              <Button href="/tornei" size="lg">
                 Altri tornei
               </Button>
             </div>
