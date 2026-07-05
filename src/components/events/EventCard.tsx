@@ -31,7 +31,7 @@ export function EventCard({ event, priority = false }: { event: Event; priority?
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-5">
-        <h3 className="font-display text-xl sm:text-2xl text-foreground group-hover:text-gold-light transition-colors">
+        <h3 className="font-sans text-lg font-bold sm:text-xl text-foreground group-hover:text-gold-light transition-colors">
           {event.title}
         </h3>
 
