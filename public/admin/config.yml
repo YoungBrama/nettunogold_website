@@ -1,0 +1,152 @@
+# ============================================================================
+# CONFIGURAZIONE PANNELLO CONTENUTI (Decap CMS) — Nettuno Gold
+# ============================================================================
+# Questo file definisce i campi che lo staff vede nel pannello /admin.
+# Ogni collection legge/scrive i file .json in una cartella di content/,
+# la stessa che legge il sito (src/lib/data/*.ts + src/lib/content-loader.ts).
+#
+# ATTIVAZIONE IN PRODUZIONE (passo esterno, da fare una volta sola):
+# il backend "github" richiede un'app OAuth registrata su GitHub e un
+# piccolo servizio "proxy" che gestisce il login (Decap fornisce un
+# provider gratuito ospitabile su Vercel/Netlify in un minuto). Vedi
+# la sezione "CMS" del README.md per il collegamento alla guida ufficiale
+# e i valori esatti da inserire qui sotto (base_url, auth_endpoint).
+#
+# SVILUPPO LOCALE: lancia "npx decap-server" in un terminale e "npm run dev"
+# in un altro; con local_backend: true qui sotto, il pannello scrive
+# direttamente sui file locali senza bisogno di login GitHub.
+# ============================================================================
+
+local_backend: true
+
+backend:
+  name: github
+  repo: YoungBrama/nettunogold_website
+  branch: main
+
+publish_mode: simple
+media_folder: "public/eventi"
+public_folder: "/eventi"
+
+collections:
+  - name: "eventi"
+    label: "Tornei"
+    folder: "content/eventi"
+    extension: "json"
+    format: "json"
+    create: true
+    slug: "{{fields.date}}-{{fields.slug}}"
+    identifier_field: title
+    fields:
+      - { label: "Nome del torneo", name: "title", widget: "string" }
+      - { label: "Slug (indirizzo web, es. freezeout-garantito-3000)", name: "slug", widget: "string", pattern: ["^[a-z0-9]+(-[a-z0-9]+)*$", "Solo minuscole, numeri e trattini"] }
+      - { label: "Data", name: "date", widget: "date", date_format: "YYYY-MM-DD", time_format: false }
+      - { label: "Orario (HH:MM)", name: "time", widget: "string", pattern: ["^([01]\\d|2[0-3]):[0-5]\\d$", "Formato HH:MM, es. 20:00"] }
+      - label: "Formato"
+        name: "format"
+        widget: "select"
+        options:
+          [
+            "Freezeout",
+            "Rebuy",
+            "Bounty",
+            "Progressive Bounty",
+            "Mystery Bounty",
+            "Deepstack",
+            "Turbo",
+            "Speed",
+            "Satellite",
+            "6-Handed",
+            "8-Handed",
+            "Pot Limit Omaha",
+          ]
+      - { label: "Buy-in (euro)", name: "buyIn", widget: "number", value_type: "float" }
+      - { label: "Fee/rake (euro)", name: "fee", widget: "number", value_type: "float", required: false }
+      - { label: "Stack iniziale (chips)", name: "startingStack", widget: "number", value_type: "int" }
+      - { label: "Montepremi garantito (euro)", name: "guaranteed", widget: "number", value_type: "float", required: false }
+      - label: "Serie di appartenenza"
+        name: "seriesSlug"
+        widget: "relation"
+        collection: "serie"
+        search_fields: ["title"]
+        value_field: "slug"
+        display_fields: ["title"]
+        required: false
+      - { label: "Fase/flight (es. Day 1A, Final Day)", name: "phase", widget: "string", required: false }
+      - { label: "Location (solo se diversa da Nettuno Gold)", name: "location", widget: "string", required: false }
+      - { label: "Descrizione", name: "description", widget: "text" }
+      - { label: "Locandina", name: "image", widget: "image", default: "/eventi/placeholder-torneo.svg", required: false }
+      - { label: "Late registration", name: "lateRegistration", widget: "string", required: false }
+      - label: "Struttura livelli"
+        name: "structure"
+        widget: "list"
+        required: false
+        fields:
+          - { label: "Livello", name: "level", widget: "number", value_type: "int" }
+          - { label: "Small Blind", name: "smallBlind", widget: "number", value_type: "int" }
+          - { label: "Big Blind", name: "bigBlind", widget: "number", value_type: "int" }
+          - { label: "Ante", name: "ante", widget: "number", value_type: "int", default: 0 }
+          - { label: "Durata (minuti)", name: "duration", widget: "number", value_type: "int" }
+      - label: "Informazioni aggiuntive (campi liberi)"
+        name: "extraFields"
+        widget: "list"
+        required: false
+        fields:
+          - { label: "Etichetta", name: "label", widget: "string" }
+          - { label: "Valore", name: "value", widget: "string" }
+
+  - name: "serie"
+    label: "Serie / Festival"
+    folder: "content/serie"
+    extension: "json"
+    format: "json"
+    create: true
+    slug: "{{fields.slug}}"
+    identifier_field: title
+    fields:
+      - { label: "Nome della serie", name: "title", widget: "string" }
+      - { label: "Slug (indirizzo web)", name: "slug", widget: "string", pattern: ["^[a-z0-9]+(-[a-z0-9]+)*$", "Solo minuscole, numeri e trattini"] }
+      - { label: "Descrizione", name: "description", widget: "text" }
+      - { label: "Immagine", name: "image", widget: "image", default: "/eventi/placeholder-torneo.svg", required: false }
+      - { label: "Montepremi garantito complessivo (euro)", name: "guaranteed", widget: "number", value_type: "float", required: false }
+      - { label: "Data inizio", name: "startDate", widget: "date", date_format: "YYYY-MM-DD", time_format: false }
+      - { label: "Data fine (Final Day)", name: "endDate", widget: "date", date_format: "YYYY-MM-DD", time_format: false }
+
+  - name: "news"
+    label: "News"
+    folder: "content/news"
+    extension: "json"
+    format: "json"
+    create: true
+    slug: "{{fields.slug}}"
+    identifier_field: title
+    fields:
+      - { label: "Titolo", name: "title", widget: "string" }
+      - { label: "Slug (indirizzo web)", name: "slug", widget: "string", pattern: ["^[a-z0-9]+(-[a-z0-9]+)*$", "Solo minuscole, numeri e trattini"] }
+      - { label: "Data", name: "date", widget: "date", date_format: "YYYY-MM-DD", time_format: false }
+      - { label: "Categoria", name: "category", widget: "select", options: ["Risultati", "Comunicato", "Evento speciale"] }
+      - { label: "Anteprima (excerpt)", name: "excerpt", widget: "text" }
+      - { label: "Paragrafi", name: "body", widget: "list", field: { label: "Paragrafo", name: "paragraph", widget: "text" } }
+      - { label: "Immagine", name: "image", widget: "image", default: "/news/placeholder-news.svg", required: false }
+
+  - name: "classifiche"
+    label: "Classifiche"
+    folder: "content/classifiche"
+    extension: "json"
+    format: "json"
+    create: true
+    slug: "{{fields.slug}}"
+    identifier_field: title
+    fields:
+      - { label: "Titolo classifica", name: "title", widget: "string" }
+      - { label: "Slug (indirizzo web)", name: "slug", widget: "string", pattern: ["^[a-z0-9]+(-[a-z0-9]+)*$", "Solo minuscole, numeri e trattini"] }
+      - { label: "Serie in corso", name: "seriesActive", widget: "boolean", default: true }
+      - { label: "Ultimo aggiornamento", name: "updatedAt", widget: "date", date_format: "YYYY-MM-DD", time_format: false }
+      - label: "Classifica"
+        name: "standings"
+        widget: "list"
+        fields:
+          - { label: "Posizione", name: "position", widget: "number", value_type: "int" }
+          - { label: "Nome giocatore", name: "playerName", widget: "string" }
+          - { label: "Punti", name: "points", widget: "number", value_type: "int" }
+          - { label: "Tornei giocati", name: "events", widget: "number", value_type: "int", default: 0 }

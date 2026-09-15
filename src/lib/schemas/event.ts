@@ -7,10 +7,20 @@ export const EVENT_FORMATS = [
   "Rebuy",
   "Bounty",
   "Progressive Bounty",
+  "Mystery Bounty",
   "Deepstack",
   "Turbo",
+  "Speed",
   "Satellite",
+  "6-Handed",
+  "8-Handed",
+  "Pot Limit Omaha",
 ] as const;
+
+export const extraFieldSchema = z.object({
+  label: z.string("L'etichetta del campo extra è obbligatoria").min(1),
+  value: z.string("Il valore del campo extra è obbligatorio").min(1),
+});
 
 export const blindLevelSchema = z.object({
   level: z.number("Il livello deve essere un numero").int().positive(),
@@ -61,7 +71,17 @@ export const eventSchema = z.object({
     .nullable()
     .default(null),
 
-  series: z.string().nullable().default(null),
+  // Collega questo torneo a una Serie (content/serie/): usa lo slug della
+  // serie, es. "pgs-spring-edition". Se non appartiene a nessuna serie: null.
+  seriesSlug: z.string().nullable().default(null),
+
+  // Etichetta del flight dentro una serie multiday, es. "Day 1A", "Day 2C",
+  // "Final Day". Ha senso solo se seriesSlug è compilato. Altrimenti: null.
+  phase: z.string().nullable().default(null),
+
+  // Località del torneo se diversa da Nettuno Gold (es. un flight satellite
+  // giocato in un altro circolo/città). Se si gioca a Nettuno Gold: null.
+  location: z.string().nullable().default(null),
 
   description: z
     .string("La descrizione è obbligatoria")
@@ -72,7 +92,12 @@ export const eventSchema = z.object({
   lateRegistration: z.string().nullable().default(null),
 
   structure: z.array(blindLevelSchema).nullable().default(null),
+
+  // Informazioni aggiuntive libere, per casi non previsti dai campi sopra
+  // (es. { label: "Qualifica", value: "Day 2A" }, { label: "Note", value: "Stop al 12% del field" }).
+  extraFields: z.array(extraFieldSchema).default([]),
 });
 
 export type Event = z.infer<typeof eventSchema>;
 export type BlindLevel = z.infer<typeof blindLevelSchema>;
+export type ExtraField = z.infer<typeof extraFieldSchema>;

@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getEvents } from "@/lib/data/events";
 import { getNews } from "@/lib/data/news";
+import { getAllSeries } from "@/lib/data/series";
 import { SITE_URL } from "@/lib/site-config";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -34,5 +35,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.4,
   }));
 
-  return [...staticRoutes, ...eventRoutes, ...newsRoutes];
+  const seriesRoutes: MetadataRoute.Sitemap = getAllSeries().map((series) => ({
+    url: `${SITE_URL}/tornei/serie/${series.slug}`,
+    lastModified: new Date(series.endDate),
+    changeFrequency: "weekly",
+    priority: 0.7,
+  }));
+
+  return [...staticRoutes, ...eventRoutes, ...seriesRoutes, ...newsRoutes];
 }

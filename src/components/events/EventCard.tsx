@@ -5,7 +5,19 @@ import type { Event } from "@/lib/schemas/event";
 import { Badge } from "@/components/ui/Badge";
 import { formatDateIt, formatEuro, formatNumberIt } from "@/lib/utils";
 
-export function EventCard({ event, priority = false }: { event: Event; priority?: boolean }) {
+// Nota: la card non risolve da sola il titolo della serie (event.seriesSlug)
+// perché è usata anche dentro componenti client (calendario di
+// TorneiExplorer) dove il layer dati basato su fs non può essere importato.
+// Se serve mostrare il badge serie, il chiamante passa già "seriesTitle".
+export function EventCard({
+  event,
+  priority = false,
+  seriesTitle,
+}: {
+  event: Event;
+  priority?: boolean;
+  seriesTitle?: string;
+}) {
   return (
     <Link
       href={`/eventi/${event.slug}`}
@@ -22,9 +34,10 @@ export function EventCard({ event, priority = false }: { event: Event; priority?
         />
         <div className="absolute left-3 top-3 flex flex-wrap gap-2">
           <Badge>{event.format}</Badge>
-          {event.series && (
+          {seriesTitle && (
             <Badge className="border-gold-light/50 bg-gold-light/10 text-gold-light">
-              {event.series}
+              {seriesTitle}
+              {event.phase ? ` — ${event.phase}` : ""}
             </Badge>
           )}
         </div>

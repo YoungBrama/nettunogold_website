@@ -1,4 +1,4 @@
-import { rawEvents } from "@content/eventi";
+import { loadRawContent } from "@/lib/content-loader";
 import { eventSchema, type Event } from "@/lib/schemas/event";
 
 function formatZodIssues(issues: { path: PropertyKey[]; message: string }[]) {
@@ -12,13 +12,15 @@ let cachedEvents: Event[] | null = null;
 function parseAllEvents(): Event[] {
   if (cachedEvents) return cachedEvents;
 
+  const rawEvents = loadRawContent("eventi");
+
   const parsed = rawEvents.map((raw, index) => {
     const result = eventSchema.safeParse(raw);
     if (!result.success) {
       throw new Error(
-        `\n\nERRORE nel torneo #${index + 1} in content/eventi/index.ts:\n` +
+        `\n\nERRORE nel torneo #${index + 1} in content/eventi/:\n` +
           `${formatZodIssues(result.error.issues)}\n\n` +
-          `Apri il file dell'evento indicato in "content/eventi/index.ts" e correggi i campi sopra elencati.\n`
+          `Apri il file dell'evento indicato in "content/eventi/" e correggi i campi sopra elencati.\n`
       );
     }
     return result.data;
@@ -53,4 +55,10 @@ export function getEventBySlug(slug: string): Event | undefined {
 export function getEventFormats(): Event["format"][] {
   const formats = new Set(parseAllEvents().map((event) => event.format));
   return Array.from(formats);
+}
+
+// Tutti i flight/tornei collegati a una serie (es. tutti i Day di un
+// festival), ordinati cronologicamente. Usata dalla pagina della serie.
+export function getEventsBySeriesSlug(seriesSlug: string): Event[] {
+  return parseAllEvents().filter((event) => event.seriesSlug === seriesSlug);
 }

@@ -1,4 +1,4 @@
-import { rawNews } from "@content/news";
+import { loadRawContent } from "@/lib/content-loader";
 import { newsSchema, type NewsPost } from "@/lib/schemas/news";
 
 let cachedNews: NewsPost[] | null = null;
@@ -6,15 +6,15 @@ let cachedNews: NewsPost[] | null = null;
 function parseAllNews(): NewsPost[] {
   if (cachedNews) return cachedNews;
 
+  const rawNews = loadRawContent("news");
+
   const parsed = rawNews.map((raw, index) => {
     const result = newsSchema.safeParse(raw);
     if (!result.success) {
       const details = result.error.issues
         .map((issue) => `  • campo "${issue.path.join(".") || "?"}": ${issue.message}`)
         .join("\n");
-      throw new Error(
-        `\n\nERRORE nella news #${index + 1} in content/news/index.ts:\n${details}\n`
-      );
+      throw new Error(`\n\nERRORE nella news #${index + 1} in content/news/:\n${details}\n`);
     }
     return result.data;
   });

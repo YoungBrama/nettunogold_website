@@ -5,7 +5,11 @@ import { Button } from "@/components/ui/Button";
 import { EventCard } from "@/components/events/EventCard";
 
 export function ProssimiTornei() {
-  const events = getUpcomingEvents(4);
+  // Come in /tornei, i singoli flight di una serie non compaiono qui: hanno
+  // la loro pagina serie dedicata, raggiungibile dal calendario completo.
+  const events = getUpcomingEvents()
+    .filter((event) => !event.seriesSlug)
+    .slice(0, 4);
 
   return (
     <section className="bg-background py-20 md:py-28">

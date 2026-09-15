@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CalendarDays, Clock, Coins, Layers, Timer, ArrowLeft } from "lucide-react";
 import { getEventBySlug, getEvents } from "@/lib/data/events";
+import { getSeriesBySlug } from "@/lib/data/series";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -42,6 +43,8 @@ export default async function EventoPage({
   const event = getEventBySlug(slug);
   if (!event) notFound();
 
+  const series = event.seriesSlug ? getSeriesBySlug(event.seriesSlug) : undefined;
+
   const stats = [
     { icon: CalendarDays, label: "Data", value: formatDateIt(event.date) },
     { icon: Clock, label: "Orario", value: event.time },
@@ -76,16 +79,25 @@ export default async function EventoPage({
           <div className="flex flex-col gap-6 lg:col-span-3">
             <div className="flex flex-wrap gap-2">
               <Badge>{event.format}</Badge>
-              {event.series && (
-                <Badge className="border-gold-light/50 bg-gold-light/10 text-gold-light">
-                  {event.series}
-                </Badge>
+              {series && (
+                <Link href={`/tornei/serie/${series.slug}`}>
+                  <Badge className="border-gold-light/50 bg-gold-light/10 text-gold-light hover:border-gold-light">
+                    {series.title}
+                    {event.phase ? ` — ${event.phase}` : ""}
+                  </Badge>
+                </Link>
               )}
             </div>
 
             <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-gold-gradient">
               {event.title}
             </h1>
+
+            {event.location && (
+              <p className="text-sm uppercase tracking-widest text-muted">
+                Location: {event.location}
+              </p>
+            )}
 
             <p className="max-w-2xl text-foreground/85 leading-relaxed">{event.description}</p>
 
@@ -117,6 +129,17 @@ export default async function EventoPage({
               <div className="flex items-center gap-2 text-sm text-muted">
                 <Timer size={16} className="text-gold" />
                 Late registration: {event.lateRegistration}
+              </div>
+            )}
+
+            {event.extraFields.length > 0 && (
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                {event.extraFields.map((field) => (
+                  <div key={field.label}>
+                    <div className="text-muted text-xs uppercase tracking-wide">{field.label}</div>
+                    <div className="mt-1 font-medium text-foreground">{field.value}</div>
+                  </div>
+                ))}
               </div>
             )}
 
