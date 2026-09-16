@@ -33,7 +33,6 @@ export function EventCard({
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
         <div className="absolute left-3 top-3 flex flex-wrap gap-2">
-          <Badge>{event.format}</Badge>
           {seriesTitle && (
             <Badge className="border-gold-light/50 bg-gold-light/10 text-gold-light">
               {seriesTitle}

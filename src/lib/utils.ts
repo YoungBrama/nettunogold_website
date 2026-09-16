@@ -33,3 +33,9 @@ export function formatNumberIt(value: number): string {
 export function formatEuro(amount: number): string {
   return `${formatNumberIt(amount)} €`;
 }
+
+export function formatDateRangeIt(startISO: string, endISO: string): string {
+  const start = new Date(`${startISO}T00:00:00`);
+  const end = new Date(`${endISO}T00:00:00`);
+  return `${format(start, "d MMMM yyyy", { locale: it })} – ${format(end, "d MMMM yyyy", { locale: it })}`;
+}

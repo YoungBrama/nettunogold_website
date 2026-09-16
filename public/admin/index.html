@@ -8,6 +8,10 @@
          statico caricato da qui, indipendente dalla versione di Next.js/React
          usata dal resto del sito. Questa pagina non viene mai processata
          da Next: è servita così com'è da /public. -->
+    <!-- Percorso esplicito di config.yml: senza questo tag, Decap lo
+         cercherebbe con un percorso relativo alla pagina corrente, che
+         fallisce se l'URL è "/admin" senza slash finale. -->
+    <link href="/admin/config.yml" type="text/yaml" rel="cms-config-url" />
   </head>
   <body>
     <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>

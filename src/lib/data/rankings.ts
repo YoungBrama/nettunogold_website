@@ -1,14 +1,11 @@
 import { loadRawContent } from "@/lib/content-loader";
 import { rankingSchema, type Ranking } from "@/lib/schemas/ranking";
 
-let cachedRankings: Ranking[] | null = null;
-
+// Nessuna cache in memoria: vedi il commento in src/lib/data/events.ts.
 function parseAllRankings(): Ranking[] {
-  if (cachedRankings) return cachedRankings;
-
   const rawRankings = loadRawContent("classifiche");
 
-  cachedRankings = rawRankings.map((raw, index) => {
+  return rawRankings.map((raw, index) => {
     const result = rankingSchema.safeParse(raw);
     if (!result.success) {
       const details = result.error.issues
@@ -20,8 +17,6 @@ function parseAllRankings(): Ranking[] {
     }
     return result.data;
   });
-
-  return cachedRankings;
 }
 
 export function getRankings(): Ranking[] {

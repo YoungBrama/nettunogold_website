@@ -22,7 +22,7 @@ export function SeriesCard({ series, flightCount }: { series: Series; flightCoun
 
       <div className="flex flex-1 flex-col gap-3 p-5">
         <span className="text-xs font-medium uppercase tracking-widest text-gold">
-          Serie/Festival · {flightCount} {flightCount === 1 ? "tappa" : "tappe"}
+          Multi-day · {flightCount} {flightCount === 1 ? "tappa" : "tappe"}
         </span>
         <h3 className="font-sans text-lg font-bold sm:text-xl text-foreground group-hover:text-gold-light transition-colors">
           {series.title}

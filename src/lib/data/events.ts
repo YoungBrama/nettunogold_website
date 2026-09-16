@@ -7,11 +7,13 @@ function formatZodIssues(issues: { path: PropertyKey[]; message: string }[]) {
     .join("\n");
 }
 
-let cachedEvents: Event[] | null = null;
-
+// Nessuna cache in memoria: i file vengono riletti a ogni chiamata. Il
+// volume di contenuti è ridotto (poche decine di file), quindi il costo è
+// trascurabile — ed è indispensabile per vedere subito, anche in sviluppo,
+// i contenuti appena salvati dal pannello CMS senza dover riavviare il
+// server (con una cache "una volta sola" il processo non si accorgerebbe
+// mai dei nuovi file scritti su disco dal CMS).
 function parseAllEvents(): Event[] {
-  if (cachedEvents) return cachedEvents;
-
   const rawEvents = loadRawContent("eventi");
 
   const parsed = rawEvents.map((raw, index) => {
@@ -26,8 +28,7 @@ function parseAllEvents(): Event[] {
     return result.data;
   });
 
-  cachedEvents = parsed.sort((a, b) => `${a.date}T${a.time}`.localeCompare(`${b.date}T${b.time}`));
-  return cachedEvents;
+  return parsed.sort((a, b) => `${a.date}T${a.time}`.localeCompare(`${b.date}T${b.time}`));
 }
 
 export function getEvents(): Event[] {
@@ -50,11 +51,6 @@ export function getPastEvents(): Event[] {
 
 export function getEventBySlug(slug: string): Event | undefined {
   return parseAllEvents().find((event) => event.slug === slug);
-}
-
-export function getEventFormats(): Event["format"][] {
-  const formats = new Set(parseAllEvents().map((event) => event.format));
-  return Array.from(formats);
 }
 
 // Tutti i flight/tornei collegati a una serie (es. tutti i Day di un

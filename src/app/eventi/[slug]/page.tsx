@@ -4,11 +4,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CalendarDays, Clock, Coins, Layers, Timer, ArrowLeft } from "lucide-react";
 import { getEventBySlug, getEvents } from "@/lib/data/events";
-import { getSeriesBySlug } from "@/lib/data/series";
 import { Container } from "@/components/ui/Container";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { formatDateIt, formatEuro, formatNumberIt } from "@/lib/utils";
+import { formatDateIt, formatNumberIt } from "@/lib/utils";
 
 export function generateStaticParams() {
   return getEvents().map((event) => ({ slug: event.slug }));
@@ -43,18 +41,24 @@ export default async function EventoPage({
   const event = getEventBySlug(slug);
   if (!event) notFound();
 
-  const series = event.seriesSlug ? getSeriesBySlug(event.seriesSlug) : undefined;
-
-  const stats = [
-    { icon: CalendarDays, label: "Data", value: formatDateIt(event.date) },
-    { icon: Clock, label: "Orario", value: event.time },
-    { icon: Coins, label: "Buy-in", value: formatEuro(event.buyIn) },
+  const quickStats = [
+    {
+      icon: Coins,
+      label: "Buy-in",
+      value: formatNumberIt(event.buyIn),
+      highlight: true,
+    },
     { icon: Layers, label: "Stack iniziale", value: formatNumberIt(event.startingStack) },
+    {
+      icon: Timer,
+      label: "Durata livelli",
+      value: event.levelDurationMinutes ? `${event.levelDurationMinutes} min` : "—",
+    },
   ];
 
   return (
     <div className="py-12 md:py-20">
-      <Container className="flex flex-col gap-10">
+      <Container className="flex flex-col gap-8">
         <Link
           href="/tornei"
           className="inline-flex w-fit items-center gap-2 text-sm uppercase tracking-widest text-muted hover:text-gold"
@@ -62,127 +66,79 @@ export default async function EventoPage({
           <ArrowLeft size={16} /> Torna al calendario
         </Link>
 
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-5">
-          <div className="lg:col-span-2">
-            <div className="relative aspect-[16/10] w-full overflow-hidden rounded-lg border border-border-subtle">
-              <Image
-                src={event.image}
-                alt={`Locandina ${event.title}`}
-                fill
-                priority
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 40vw"
-              />
-            </div>
+        <div className="mx-auto flex w-full max-w-2xl flex-col gap-8">
+          <h1 className="text-center font-display text-3xl sm:text-4xl md:text-5xl text-gold-gradient">
+            {event.title}
+          </h1>
+
+          <div className="relative w-full overflow-hidden rounded-lg border border-border-subtle bg-surface">
+            <Image
+              src={event.image}
+              alt={`Locandina ${event.title}`}
+              width={0}
+              height={0}
+              priority
+              sizes="(max-width: 768px) 100vw, 672px"
+              style={{ width: "100%", height: "auto" }}
+              className="object-contain"
+            />
           </div>
 
-          <div className="flex flex-col gap-6 lg:col-span-3">
-            <div className="flex flex-wrap gap-2">
-              <Badge>{event.format}</Badge>
-              {series && (
-                <Link href={`/tornei/serie/${series.slug}`}>
-                  <Badge className="border-gold-light/50 bg-gold-light/10 text-gold-light hover:border-gold-light">
-                    {series.title}
-                    {event.phase ? ` — ${event.phase}` : ""}
-                  </Badge>
-                </Link>
-              )}
-            </div>
+          <div className="flex items-center justify-center gap-8 rounded-lg border border-border-subtle bg-surface p-4">
+            <span className="flex items-center gap-2 font-medium text-foreground">
+              <CalendarDays size={18} className="text-gold" />
+              {formatDateIt(event.date)}
+            </span>
+            <span className="flex items-center gap-2 font-medium text-foreground">
+              <Clock size={18} className="text-gold" />
+              {event.time}
+            </span>
+          </div>
 
-            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-gold-gradient">
-              {event.title}
-            </h1>
-
-            {event.location && (
-              <p className="text-sm uppercase tracking-widest text-muted">
-                Location: {event.location}
-              </p>
-            )}
-
-            <p className="max-w-2xl text-foreground/85 leading-relaxed">{event.description}</p>
-
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              {stats.map((stat) => (
+          <div className="grid grid-cols-3 gap-4">
+            {quickStats.map((stat) => (
+              <div
+                key={stat.label}
+                className={
+                  stat.highlight
+                    ? "rounded-lg border border-gold/40 bg-gold/10 p-4"
+                    : "rounded-lg border border-border-subtle bg-surface p-4"
+                }
+              >
+                <stat.icon size={18} className="text-gold" />
+                <div className="mt-2 text-xs uppercase tracking-widest text-muted">
+                  {stat.label}
+                </div>
                 <div
-                  key={stat.label}
-                  className="rounded-lg border border-border-subtle bg-surface p-4"
+                  className={
+                    stat.highlight ? "mt-1 font-semibold text-gold-light" : "mt-1 font-medium text-foreground"
+                  }
                 >
-                  <stat.icon size={18} className="text-gold" />
-                  <div className="mt-2 text-xs uppercase tracking-widest text-muted">
-                    {stat.label}
-                  </div>
-                  <div className="mt-1 font-medium text-foreground">{stat.value}</div>
-                </div>
-              ))}
-            </div>
-
-            {event.guaranteed ? (
-              <div className="rounded-lg border border-gold/40 bg-gold/10 p-5">
-                <div className="text-xs uppercase tracking-widest text-gold">Montepremi garantito</div>
-                <div className="mt-1 font-display text-3xl text-gold-light">
-                  {formatEuro(event.guaranteed)}
+                  {stat.value}
                 </div>
               </div>
-            ) : null}
+            ))}
+          </div>
 
-            {event.lateRegistration && (
-              <div className="flex items-center gap-2 text-sm text-muted">
-                <Timer size={16} className="text-gold" />
-                Late registration: {event.lateRegistration}
+          {event.guaranteed ? (
+            <div className="rounded-lg border border-gold/40 bg-gold/10 p-5 text-center">
+              <div className="text-xs uppercase tracking-widest text-gold">Montepremi garantito</div>
+              <div className="mt-1 font-display text-3xl text-gold-light">
+                {formatNumberIt(event.guaranteed)}
               </div>
-            )}
-
-            {event.extraFields.length > 0 && (
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                {event.extraFields.map((field) => (
-                  <div key={field.label}>
-                    <div className="text-muted text-xs uppercase tracking-wide">{field.label}</div>
-                    <div className="mt-1 font-medium text-foreground">{field.value}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Button href="/tornei" size="lg">
-                Altri tornei
-              </Button>
             </div>
+          ) : null}
+
+          <p className="text-foreground/85 leading-relaxed whitespace-pre-line">
+            {event.description}
+          </p>
+
+          <div className="flex justify-center">
+            <Button href="/tornei" size="lg">
+              Altri tornei
+            </Button>
           </div>
         </div>
-
-        {event.structure && event.structure.length > 0 && (
-          <div className="flex flex-col gap-4">
-            <h2 className="font-display text-2xl text-gold-gradient">Struttura livelli</h2>
-            <div className="overflow-x-auto rounded-lg border border-border-subtle">
-              <table className="w-full min-w-[480px] text-left text-sm">
-                <thead className="bg-surface text-xs uppercase tracking-widest text-muted">
-                  <tr>
-                    <th className="px-4 py-3">Livello</th>
-                    <th className="px-4 py-3">Small Blind</th>
-                    <th className="px-4 py-3">Big Blind</th>
-                    <th className="px-4 py-3">Ante</th>
-                    <th className="px-4 py-3">Durata</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {event.structure.map((level) => (
-                    <tr key={level.level} className="border-t border-border-subtle">
-                      <td className="px-4 py-3 text-gold-light">{level.level}</td>
-                      <td className="px-4 py-3">{formatNumberIt(level.smallBlind)}</td>
-                      <td className="px-4 py-3">{formatNumberIt(level.bigBlind)}</td>
-                      <td className="px-4 py-3">{level.ante ? formatNumberIt(level.ante) : "—"}</td>
-                      <td className="px-4 py-3">{level.duration} min</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <p className="text-xs text-muted">
-              Struttura indicativa dei primi livelli; consulta lo staff in sala per i livelli successivi.
-            </p>
-          </div>
-        )}
       </Container>
     </div>
   );

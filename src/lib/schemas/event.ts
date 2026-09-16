@@ -1,21 +1,5 @@
 import { z } from "zod";
-
-// Formati torneo ammessi. Se serve aggiungerne uno nuovo, aggiungilo qui
-// (è l'unico punto da modificare per far accettare il nuovo valore).
-export const EVENT_FORMATS = [
-  "Freezeout",
-  "Rebuy",
-  "Bounty",
-  "Progressive Bounty",
-  "Mystery Bounty",
-  "Deepstack",
-  "Turbo",
-  "Speed",
-  "Satellite",
-  "6-Handed",
-  "8-Handed",
-  "Pot Limit Omaha",
-] as const;
+import { slugify, dateSlugSuffix } from "@/lib/slug";
 
 export const extraFieldSchema = z.object({
   label: z.string("L'etichetta del campo extra è obbligatoria").min(1),
@@ -32,17 +16,21 @@ export const blindLevelSchema = z.object({
     .positive("La durata del livello deve essere maggiore di zero"),
 });
 
-export const eventSchema = z.object({
+const eventShape = z.object({
   title: z
     .string("Il titolo del torneo è obbligatorio")
     .min(3, "Il titolo del torneo deve avere almeno 3 caratteri"),
 
+  // Generato automaticamente da titolo + data se non specificato: lo staff
+  // non deve mai compilarlo a mano (vedi .transform() più sotto).
   slug: z
-    .string("Lo slug è obbligatorio")
+    .string()
     .regex(
       /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
       "Lo slug può contenere solo lettere minuscole, numeri e trattini (es. 'freezeout-garantito-3000')"
-    ),
+    )
+    .nullable()
+    .default(null),
 
   date: z
     .string("La data è obbligatoria")
@@ -51,11 +39,6 @@ export const eventSchema = z.object({
   time: z
     .string("L'orario è obbligatorio")
     .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "L'orario deve essere nel formato HH:MM (es. 20:00)"),
-
-  format: z.enum(
-    EVENT_FORMATS,
-    `Il formato non è valido. Valori ammessi: ${EVENT_FORMATS.join(", ")}`
-  ),
 
   buyIn: z.number("Il buy-in deve essere un numero (in euro)").nonnegative("Il buy-in non può essere negativo"),
 
@@ -93,10 +76,25 @@ export const eventSchema = z.object({
 
   structure: z.array(blindLevelSchema).nullable().default(null),
 
+  // Durata di un livello di blind, in minuti (mostrata nella scheda torneo
+  // come dato rapido, indipendente dalla struttura livelli dettagliata
+  // sopra). Se non nota/variabile: null.
+  levelDurationMinutes: z
+    .number("La durata dei livelli deve essere un numero (minuti)")
+    .int()
+    .positive()
+    .nullable()
+    .default(null),
+
   // Informazioni aggiuntive libere, per casi non previsti dai campi sopra
   // (es. { label: "Qualifica", value: "Day 2A" }, { label: "Note", value: "Stop al 12% del field" }).
   extraFields: z.array(extraFieldSchema).default([]),
 });
+
+export const eventSchema = eventShape.transform((data) => ({
+  ...data,
+  slug: data.slug ?? `${slugify(data.title)}-${dateSlugSuffix(data.date)}`,
+}));
 
 export type Event = z.infer<typeof eventSchema>;
 export type BlindLevel = z.infer<typeof blindLevelSchema>;

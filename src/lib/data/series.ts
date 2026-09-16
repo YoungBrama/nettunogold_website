@@ -1,11 +1,8 @@
 import { loadRawContent } from "@/lib/content-loader";
 import { seriesSchema, type Series } from "@/lib/schemas/series";
 
-let cachedSeries: Series[] | null = null;
-
+// Nessuna cache in memoria: vedi il commento in src/lib/data/events.ts.
 function parseAllSeries(): Series[] {
-  if (cachedSeries) return cachedSeries;
-
   const rawSeries = loadRawContent("serie");
 
   const parsed = rawSeries.map((raw, index) => {
@@ -19,8 +16,7 @@ function parseAllSeries(): Series[] {
     return result.data;
   });
 
-  cachedSeries = parsed.sort((a, b) => a.startDate.localeCompare(b.startDate));
-  return cachedSeries;
+  return parsed.sort((a, b) => a.startDate.localeCompare(b.startDate));
 }
 
 export function getAllSeries(): Series[] {
