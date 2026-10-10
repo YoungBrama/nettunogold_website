@@ -21,13 +21,15 @@ export async function generateMetadata({
   const event = getEventBySlug(slug);
   if (!event) return {};
 
+  const description = event.description ?? event.title;
+
   return {
     title: event.title,
-    description: event.description,
+    description,
     openGraph: {
       title: event.title,
-      description: event.description,
-      images: [{ url: event.image }],
+      description,
+      images: event.images.map((url) => ({ url })),
     },
   };
 }
@@ -48,13 +50,15 @@ export default async function EventoPage({
       value: formatNumberIt(event.buyIn),
       highlight: true,
     },
-    { icon: Layers, label: "Stack iniziale", value: formatNumberIt(event.startingStack) },
+    event.startingStack
+      ? { icon: Layers, label: "Stack iniziale", value: formatNumberIt(event.startingStack) }
+      : null,
     {
       icon: Timer,
       label: "Durata livelli",
       value: event.levelDurationMinutes ? `${event.levelDurationMinutes} min` : "—",
     },
-  ];
+  ].filter((stat) => stat !== null);
 
   return (
     <div className="py-12 md:py-20">
@@ -71,17 +75,24 @@ export default async function EventoPage({
             {event.title}
           </h1>
 
-          <div className="relative w-full overflow-hidden rounded-lg border border-border-subtle bg-surface">
-            <Image
-              src={event.image}
-              alt={`Locandina ${event.title}`}
-              width={0}
-              height={0}
-              priority
-              sizes="(max-width: 768px) 100vw, 672px"
-              style={{ width: "100%", height: "auto" }}
-              className="object-contain"
-            />
+          <div className="flex flex-col gap-4">
+            {event.images.map((src, i) => (
+              <div
+                key={src + i}
+                className="relative w-full overflow-hidden rounded-lg border border-border-subtle bg-surface"
+              >
+                <Image
+                  src={src}
+                  alt={`Locandina ${event.title}${event.images.length > 1 ? ` ${i + 1}` : ""}`}
+                  width={0}
+                  height={0}
+                  priority={i === 0}
+                  sizes="(max-width: 768px) 100vw, 672px"
+                  style={{ width: "100%", height: "auto" }}
+                  className="object-contain"
+                />
+              </div>
+            ))}
           </div>
 
           <div className="flex items-center justify-center gap-8 rounded-lg border border-border-subtle bg-surface p-4">
@@ -129,9 +140,11 @@ export default async function EventoPage({
             </div>
           ) : null}
 
-          <p className="text-foreground/85 leading-relaxed whitespace-pre-line">
-            {event.description}
-          </p>
+          {event.description ? (
+            <p className="text-foreground/85 leading-relaxed whitespace-pre-line">
+              {event.description}
+            </p>
+          ) : null}
 
           <div className="flex justify-center">
             <Button href="/tornei" size="lg">

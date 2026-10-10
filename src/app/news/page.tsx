@@ -33,7 +33,7 @@ export default function NewsPage() {
             >
               <div className="relative aspect-[16/10] w-full overflow-hidden bg-background">
                 <Image
-                  src={post.image}
+                  src={post.images[0]}
                   alt={post.title}
                   fill
                   className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"

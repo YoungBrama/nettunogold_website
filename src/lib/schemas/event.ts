@@ -1,26 +1,54 @@
 import { z } from "zod";
 import { slugify, dateSlugSuffix } from "@/lib/slug";
+import { dayFieldSchema, monthFieldSchema, yearFieldSchema, isValidCalendarDate } from "@/lib/schemas/date-parts";
+import { optionalNumber } from "@/lib/schemas/optional-number";
 
-export const extraFieldSchema = z.object({
-  label: z.string("L'etichetta del campo extra è obbligatoria").min(1),
-  value: z.string("Il valore del campo extra è obbligatorio").min(1),
+const torneoGroupSchema = z
+  .object({
+    title: z
+      .string("Il titolo del torneo è obbligatorio")
+      .min(3, "Il titolo del torneo deve avere almeno 3 caratteri"),
+
+    day: dayFieldSchema,
+    month: monthFieldSchema,
+    year: yearFieldSchema,
+
+    time: z
+      .string("L'orario è obbligatorio")
+      .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "L'orario deve essere nel formato HH:MM (es. 20:00)"),
+  })
+  .refine((data) => isValidCalendarDate(Number(data.day), Number(data.month), Number(data.year)), {
+    message: "La data inserita non esiste nel calendario (controlla giorno e mese)",
+    path: ["day"],
+  });
+
+const serieGroupSchema = z.object({
+  // Collega questo torneo a una Serie (content/serie/): usa lo slug della
+  // serie, es. "pgs-spring-edition". Se non appartiene a nessuna serie: null.
+  seriesSlug: z.string().nullable().default(null),
+
+  // Etichetta del flight dentro una serie multiday, es. "Day 1A", "Day 2C",
+  // "Final Day". Ha senso solo se seriesSlug è compilato. Altrimenti: null.
+  phase: z.string().nullable().default(null),
 });
 
-export const blindLevelSchema = z.object({
-  level: z.number("Il livello deve essere un numero").int().positive(),
-  smallBlind: z.number("La small blind deve essere un numero").nonnegative(),
-  bigBlind: z.number("La big blind deve essere un numero").nonnegative(),
-  ante: z.number("L'ante deve essere un numero").nonnegative().default(0),
-  duration: z
-    .number("La durata del livello deve essere un numero (minuti)")
-    .positive("La durata del livello deve essere maggiore di zero"),
+const dettagliGroupSchema = z.object({
+  buyIn: z.number("Il buy-in deve essere un numero (in euro)").nonnegative("Il buy-in non può essere negativo"),
+
+  guaranteed: optionalNumber(z.number("Il garantito deve essere un numero (in euro)").nonnegative()),
+
+  startingStack: optionalNumber(
+    z.number("Lo stack iniziale deve essere un numero (in chips)").positive("Lo stack iniziale deve essere maggiore di zero")
+  ),
+
+  // Durata di un livello di blind, in minuti (dato rapido mostrato nella
+  // scheda torneo). Se non nota/variabile: null.
+  levelDurationMinutes: optionalNumber(
+    z.number("La durata dei livelli deve essere un numero (minuti)").int().positive()
+  ),
 });
 
 const eventShape = z.object({
-  title: z
-    .string("Il titolo del torneo è obbligatorio")
-    .min(3, "Il titolo del torneo deve avere almeno 3 caratteri"),
-
   // Generato automaticamente da titolo + data se non specificato: lo staff
   // non deve mai compilarlo a mano (vedi .transform() più sotto).
   slug: z
@@ -32,70 +60,41 @@ const eventShape = z.object({
     .nullable()
     .default(null),
 
-  date: z
-    .string("La data è obbligatoria")
-    .regex(/^\d{4}-\d{2}-\d{2}$/, "La data deve essere nel formato AAAA-MM-GG (es. 2026-07-10)"),
-
-  time: z
-    .string("L'orario è obbligatorio")
-    .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "L'orario deve essere nel formato HH:MM (es. 20:00)"),
-
-  buyIn: z.number("Il buy-in deve essere un numero (in euro)").nonnegative("Il buy-in non può essere negativo"),
-
-  fee: z.number("La fee/rake deve essere un numero (in euro)").nonnegative().nullable().default(null),
-
-  startingStack: z
-    .number("Lo stack iniziale deve essere un numero (in chips)")
-    .positive("Lo stack iniziale deve essere maggiore di zero"),
-
-  guaranteed: z
-    .number("Il garantito deve essere un numero (in euro)")
-    .nonnegative()
-    .nullable()
-    .default(null),
-
-  // Collega questo torneo a una Serie (content/serie/): usa lo slug della
-  // serie, es. "pgs-spring-edition". Se non appartiene a nessuna serie: null.
-  seriesSlug: z.string().nullable().default(null),
-
-  // Etichetta del flight dentro una serie multiday, es. "Day 1A", "Day 2C",
-  // "Final Day". Ha senso solo se seriesSlug è compilato. Altrimenti: null.
-  phase: z.string().nullable().default(null),
-
-  // Località del torneo se diversa da Nettuno Gold (es. un flight satellite
-  // giocato in un altro circolo/città). Se si gioca a Nettuno Gold: null.
-  location: z.string().nullable().default(null),
+  torneo: torneoGroupSchema,
+  serie: serieGroupSchema.default({ seriesSlug: null, phase: null }),
+  dettagli: dettagliGroupSchema,
 
   description: z
-    .string("La descrizione è obbligatoria")
-    .min(10, "La descrizione deve avere almeno 10 caratteri"),
-
-  image: z.string().default("/eventi/placeholder-torneo.svg"),
-
-  lateRegistration: z.string().nullable().default(null),
-
-  structure: z.array(blindLevelSchema).nullable().default(null),
-
-  // Durata di un livello di blind, in minuti (mostrata nella scheda torneo
-  // come dato rapido, indipendente dalla struttura livelli dettagliata
-  // sopra). Se non nota/variabile: null.
-  levelDurationMinutes: z
-    .number("La durata dei livelli deve essere un numero (minuti)")
-    .int()
-    .positive()
+    .string()
     .nullable()
-    .default(null),
+    .default(null)
+    .transform((value) => (value && value.trim().length > 0 ? value : null)),
 
-  // Informazioni aggiuntive libere, per casi non previsti dai campi sopra
-  // (es. { label: "Qualifica", value: "Day 2A" }, { label: "Note", value: "Stop al 12% del field" }).
-  extraFields: z.array(extraFieldSchema).default([]),
+  // Una o più locandine: mostrate incolonnate, nell'ordine in cui sono
+  // state aggiunte, nella scheda torneo.
+  images: z
+    .array(z.string())
+    .min(1, "Serve almeno un'immagine")
+    .default(["/eventi/placeholder-torneo.svg"]),
 });
 
-export const eventSchema = eventShape.transform((data) => ({
-  ...data,
-  slug: data.slug ?? `${slugify(data.title)}-${dateSlugSuffix(data.date)}`,
-}));
+export const eventSchema = eventShape.transform((data) => {
+  const date = `${data.torneo.year}-${data.torneo.month}-${data.torneo.day}`;
+
+  return {
+    title: data.torneo.title,
+    slug: data.slug ?? `${slugify(data.torneo.title)}-${dateSlugSuffix(date)}`,
+    date,
+    time: data.torneo.time,
+    buyIn: data.dettagli.buyIn,
+    guaranteed: data.dettagli.guaranteed,
+    startingStack: data.dettagli.startingStack,
+    levelDurationMinutes: data.dettagli.levelDurationMinutes,
+    seriesSlug: data.serie.seriesSlug,
+    phase: data.serie.phase,
+    description: data.description,
+    images: data.images,
+  };
+});
 
 export type Event = z.infer<typeof eventSchema>;
-export type BlindLevel = z.infer<typeof blindLevelSchema>;
-export type ExtraField = z.infer<typeof extraFieldSchema>;

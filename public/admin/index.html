@@ -12,6 +12,101 @@
          cercherebbe con un percorso relativo alla pagina corrente, che
          fallisce se l'URL è "/admin" senza slash finale. -->
     <link href="/admin/config.yml" type="text/yaml" rel="cms-config-url" />
+    <style>
+      /* Raggruppamento visivo dei campi torneo/serie/dettagli nel pannello.
+         Decap assegna al contenitore dei campi di ogni gruppo (widget
+         "object" in config.yml) un id "<nome-campo>-field-<n>": il nome
+         è quello del campo, il numero è solo un contatore di posizione
+         nel form. Il selettore [id^="..."] ignora quel numero e resta
+         valido anche se altri campi vengono aggiunti/rimossi altrove nel
+         form — non dipende dalle classi CSS generate da Decap, che sono
+         hash instabili tra una versione e l'altra.
+         L'editor del CMS non è in un iframe (solo l'anteprima a destra lo
+         è), quindi questo <style> nella pagina si applica davvero al form. */
+      div:has(> [id^="torneo-field-"]) {
+        border: 2px solid #caa14d;
+        border-radius: 10px;
+        background: #fbf3e1;
+        overflow: hidden;
+        margin-bottom: 16px;
+      }
+      div:has(> [id^="torneo-field-"]) > div:first-child {
+        background: #eecf8d;
+      }
+
+      div:has(> [id^="serie-field-"]) {
+        border: 2px solid #8b6bb0;
+        border-radius: 10px;
+        background: #f2ecfa;
+        overflow: hidden;
+        margin-bottom: 16px;
+      }
+      div:has(> [id^="serie-field-"]) > div:first-child {
+        background: #d6c3ec;
+      }
+
+      div:has(> [id^="dettagli-field-"]) {
+        border: 2px solid #3f9e77;
+        border-radius: 10px;
+        background: #e7f6ef;
+        overflow: hidden;
+        margin-bottom: 16px;
+      }
+      div:has(> [id^="dettagli-field-"]) > div:first-child {
+        background: #b7e4cd;
+      }
+
+      /* Giorno/Mese/Anno/Ora affiancati su una riga (il nome del torneo
+         resta a piena larghezza sulla riga sopra). */
+      [id^="torneo-field-"] > div:last-child {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      [id^="torneo-field-"] > div:last-child > div:first-child {
+        flex: 1 1 100%;
+      }
+      [id^="torneo-field-"] > div:last-child > div:not(:first-child) {
+        flex: 1 1 130px;
+        min-width: 110px;
+      }
+
+      /* Serie / Festival: gruppi "Informazioni" (blu) e "Media" (rosa) */
+      div:has(> [id^="informazioni-field-"]) {
+        border: 2px solid #4f7cbb;
+        border-radius: 10px;
+        background: #e9f0fb;
+        overflow: hidden;
+        margin-bottom: 16px;
+      }
+      div:has(> [id^="informazioni-field-"]) > div:first-child {
+        background: #bcd2ef;
+      }
+
+      div:has(> [id^="media-field-"]) {
+        border: 2px solid #c0577e;
+        border-radius: 10px;
+        background: #fbeaf0;
+        overflow: hidden;
+        margin-bottom: 16px;
+      }
+      div:has(> [id^="media-field-"]) > div:first-child {
+        background: #f0bdd0;
+      }
+
+      /* Data inizio/fine della serie: Giorno/Mese/Anno affiancati su una riga */
+      [id^="inizio-field-"] > div:last-child,
+      [id^="fine-field-"] > div:last-child {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      [id^="inizio-field-"] > div:last-child > div,
+      [id^="fine-field-"] > div:last-child > div {
+        flex: 1 1 130px;
+        min-width: 110px;
+      }
+    </style>
   </head>
   <body>
     <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>

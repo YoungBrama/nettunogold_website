@@ -1,0 +1,20 @@
+{
+  "images": [
+    "/eventi/flip-go_thegladiator.jpg"
+  ],
+  "torneo": {
+    "title": "FLIP AND GO - THE GLADIATOR",
+    "day": "18",
+    "month": "09",
+    "year": "2026",
+    "time": "19:00"
+  },
+  "serie": {
+    "seriesSlug": "the-gladiator",
+    "phase": "FLIP AND GO"
+  },
+  "dettagli": {
+    "buyIn": 20,
+    "levelDurationMinutes": ""
+  }
+}

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, CalendarDays, Clock, MapPin, Timer } from "lucide-react";
+import { ArrowLeft, CalendarDays, Clock, Timer } from "lucide-react";
 import { getAllSeries, getSeriesBySlug } from "@/lib/data/series";
 import { getEventsBySeriesSlug } from "@/lib/data/events";
 import { Container } from "@/components/ui/Container";
@@ -29,7 +29,7 @@ export async function generateMetadata({
     openGraph: {
       title: series.title,
       description: series.description,
-      images: [{ url: series.image }],
+      images: series.images.map((url) => ({ url })),
     },
   };
 }
@@ -60,17 +60,24 @@ export default async function SeriePage({
             {series.title}
           </h1>
 
-          <div className="relative w-full overflow-hidden rounded-lg border border-border-subtle bg-surface">
-            <Image
-              src={series.image}
-              alt={`Locandina ${series.title}`}
-              width={0}
-              height={0}
-              priority
-              sizes="(max-width: 768px) 100vw, 672px"
-              style={{ width: "100%", height: "auto" }}
-              className="object-contain"
-            />
+          <div className="flex flex-col gap-4">
+            {series.images.map((src, i) => (
+              <div
+                key={src + i}
+                className="relative w-full overflow-hidden rounded-lg border border-border-subtle bg-surface"
+              >
+                <Image
+                  src={src}
+                  alt={`Locandina ${series.title}${series.images.length > 1 ? ` ${i + 1}` : ""}`}
+                  width={0}
+                  height={0}
+                  priority={i === 0}
+                  sizes="(max-width: 768px) 100vw, 672px"
+                  style={{ width: "100%", height: "auto" }}
+                  className="object-contain"
+                />
+              </div>
+            ))}
           </div>
 
           <span className="text-center text-sm text-muted">
@@ -118,14 +125,10 @@ export default async function SeriePage({
                         <Clock size={15} className="text-gold" />
                         {flight.time}
                       </span>
-                      {flight.location && (
-                        <span className="flex items-center gap-1.5">
-                          <MapPin size={15} className="text-gold" />
-                          {flight.location}
-                        </span>
-                      )}
                       <span>buy-in: {formatNumberIt(flight.buyIn)}</span>
-                      <span>stack: {formatNumberIt(flight.startingStack)}</span>
+                      {flight.startingStack ? (
+                        <span>stack: {formatNumberIt(flight.startingStack)}</span>
+                      ) : null}
                       {flight.levelDurationMinutes && (
                         <span className="flex items-center gap-1.5">
                           <Timer size={15} className="text-gold" />

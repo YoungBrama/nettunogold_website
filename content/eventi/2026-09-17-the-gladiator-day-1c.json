@@ -1,0 +1,21 @@
+{
+  "images": [
+    "/eventi/day1c_thegladiator.jpg"
+  ],
+  "torneo": {
+    "title": "THE GLADIATOR - DAY 1C",
+    "day": "17",
+    "month": "09",
+    "year": "2026",
+    "time": "20:00"
+  },
+  "dettagli": {
+    "buyIn": 40,
+    "startingStack": 40000,
+    "levelDurationMinutes": 20
+  },
+  "serie": {
+    "seriesSlug": "the-gladiator",
+    "phase": "1C"
+  }
+}

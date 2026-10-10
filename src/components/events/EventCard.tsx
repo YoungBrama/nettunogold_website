@@ -25,7 +25,7 @@ export function EventCard({
     >
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-background">
         <Image
-          src={event.image}
+          src={event.images[0]}
           alt={`Locandina ${event.title}`}
           fill
           priority={priority}
@@ -63,13 +63,15 @@ export function EventCard({
             <div className="text-muted text-xs uppercase tracking-wide">Buy-in</div>
             <div className="text-foreground font-medium">{formatEuro(event.buyIn)}</div>
           </div>
-          <div>
-            <div className="text-muted text-xs uppercase tracking-wide">Stack iniziale</div>
-            <div className="text-foreground font-medium flex items-center gap-1">
-              <Layers size={13} className="text-gold" />
-              {formatNumberIt(event.startingStack)}
+          {event.startingStack ? (
+            <div>
+              <div className="text-muted text-xs uppercase tracking-wide">Stack iniziale</div>
+              <div className="text-foreground font-medium flex items-center gap-1">
+                <Layers size={13} className="text-gold" />
+                {formatNumberIt(event.startingStack)}
+              </div>
             </div>
-          </div>
+          ) : null}
           {event.guaranteed ? (
             <div className="col-span-2">
               <div className="text-muted text-xs uppercase tracking-wide">Garantito</div>

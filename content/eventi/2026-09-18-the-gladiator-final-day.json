@@ -1,0 +1,21 @@
+{
+  "images": [
+    "/eventi/finalday_thegladiator.jpg"
+  ],
+  "torneo": {
+    "title": "THE GLADIATOR - FINAL DAY",
+    "day": "18",
+    "month": "09",
+    "year": "2026",
+    "time": "19:00"
+  },
+  "serie": {
+    "seriesSlug": "the-gladiator",
+    "phase": "FINAL DAY"
+  },
+  "dettagli": {
+    "buyIn": 190,
+    "startingStack": 300000,
+    "levelDurationMinutes": 30
+  }
+}

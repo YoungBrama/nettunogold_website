@@ -1,9 +1,23 @@
 {
-  "title": "Nettuno Gold Series",
   "slug": "nettuno-gold-series",
-  "description": "Sei tappe stagionali con punti classifica per la finale di fine anno: la serie di riferimento del club, con un satellite dedicato per chi vuole qualificarsi alla finale senza pagare il buy-in pieno.",
-  "image": "/eventi/placeholder-torneo.svg",
-  "guaranteed": 5000,
-  "startDate": "2026-07-18",
-  "endDate": "2026-08-15"
+  "informazioni": {
+    "title": "Nettuno Gold Series",
+    "inizio": {
+      "day": "18",
+      "month": "07",
+      "year": "2026"
+    },
+    "fine": {
+      "day": "15",
+      "month": "08",
+      "year": "2026"
+    },
+    "guaranteed": 5000
+  },
+  "media": {
+    "description": "Sei tappe stagionali con punti classifica per la finale di fine anno: la serie di riferimento del club, con un satellite dedicato per chi vuole qualificarsi alla finale senza pagare il buy-in pieno.",
+    "images": [
+      "/eventi/placeholder-torneo.svg"
+    ]
+  }
 }

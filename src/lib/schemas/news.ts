@@ -18,7 +18,12 @@ const newsShape = z.object({
   category: z.enum(NEWS_CATEGORIES, `Categoria non valida. Valori ammessi: ${NEWS_CATEGORIES.join(", ")}`),
   excerpt: z.string("L'anteprima (excerpt) è obbligatoria").min(10, "L'anteprima deve avere almeno 10 caratteri"),
   body: z.array(z.string()).min(1, "Il corpo della news deve avere almeno un paragrafo"),
-  image: z.string().default("/news/placeholder-news.svg"),
+  // Una o più immagini: mostrate incolonnate, nell'ordine in cui sono
+  // state aggiunte, nella pagina della news.
+  images: z
+    .array(z.string())
+    .min(1, "Serve almeno un'immagine")
+    .default(["/news/placeholder-news.svg"]),
 });
 
 export const newsSchema = newsShape.transform((data) => ({

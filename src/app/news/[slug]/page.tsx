@@ -23,7 +23,11 @@ export async function generateMetadata({
   return {
     title: post.title,
     description: post.excerpt,
-    openGraph: { title: post.title, description: post.excerpt, images: [{ url: post.image }] },
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      images: post.images.map((url) => ({ url })),
+    },
   };
 }
 
@@ -46,8 +50,21 @@ export default async function NewsDetailPage({
           <ArrowLeft size={16} /> Tutte le news
         </Link>
 
-        <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg border border-border-subtle">
-          <Image src={post.image} alt={post.title} fill className="object-cover" priority />
+        <div className="flex flex-col gap-4">
+          {post.images.map((src, i) => (
+            <div
+              key={src + i}
+              className="relative aspect-[16/9] w-full overflow-hidden rounded-lg border border-border-subtle"
+            >
+              <Image
+                src={src}
+                alt={`${post.title}${post.images.length > 1 ? ` ${i + 1}` : ""}`}
+                fill
+                className="object-cover"
+                priority={i === 0}
+              />
+            </div>
+          ))}
         </div>
 
         <div className="flex flex-col gap-3">

@@ -12,7 +12,7 @@ export function SeriesCard({ series, flightCount }: { series: Series; flightCoun
     >
       <div className="relative aspect-[16/9] w-full overflow-hidden bg-background">
         <Image
-          src={series.image}
+          src={series.images[0]}
           alt={`Locandina ${series.title}`}
           fill
           className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
