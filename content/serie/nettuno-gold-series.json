@@ -11,13 +11,11 @@
       "day": "15",
       "month": "08",
       "year": "2026"
-    },
+    }
+  },
+  "dettagli": {
     "guaranteed": 5000
   },
-  "media": {
-    "description": "Sei tappe stagionali con punti classifica per la finale di fine anno: la serie di riferimento del club, con un satellite dedicato per chi vuole qualificarsi alla finale senza pagare il buy-in pieno.",
-    "images": [
-      "/eventi/placeholder-torneo.svg"
-    ]
-  }
+  "images": [],
+  "description": "Sei tappe stagionali con punti classifica per la finale di fine anno: la serie di riferimento del club, con un satellite dedicato per chi vuole qualificarsi alla finale senza pagare il buy-in pieno."
 }

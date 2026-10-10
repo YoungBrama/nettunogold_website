@@ -13,102 +13,1459 @@
          fallisce se l'URL è "/admin" senza slash finale. -->
     <link href="/admin/config.yml" type="text/yaml" rel="cms-config-url" />
     <style>
-      /* Raggruppamento visivo dei campi torneo/serie/dettagli nel pannello.
-         Decap assegna al contenitore dei campi di ogni gruppo (widget
-         "object" in config.yml) un id "<nome-campo>-field-<n>": il nome
-         è quello del campo, il numero è solo un contatore di posizione
-         nel form. Il selettore [id^="..."] ignora quel numero e resta
-         valido anche se altri campi vengono aggiunti/rimossi altrove nel
-         form — non dipende dalle classi CSS generate da Decap, che sono
-         hash instabili tra una versione e l'altra.
-         L'editor del CMS non è in un iframe (solo l'anteprima a destra lo
-         è), quindi questo <style> nella pagina si applica davvero al form. */
-      div:has(> [id^="torneo-field-"]) {
-        border: 2px solid #caa14d;
-        border-radius: 10px;
-        background: #fbf3e1;
-        overflow: hidden;
-        margin-bottom: 16px;
+      /* =====================================================================
+         TEMA SCURO DEL PANNELLO
+         Decap etichetta le proprie classi CSS con il nome del componente
+         (es. "css-1x2y3z-AppHeader-css"): i selettori [class*="..."] usano
+         quel nome, che resta stabile, e non l'hash, che cambia tra versioni.
+         Palette ripresa dal sito: nero caldo + oro.
+         ===================================================================== */
+      :root {
+        --ng-bg: #0b0d10;
+        --ng-panel: #13161b;
+        --ng-panel-2: #1a1e24;
+        --ng-panel-3: #22272e;
+        --ng-border: #262b33;
+        --ng-text: #e8e3d8;
+        --ng-muted: #8d939c;
+        --ng-gold: #c9a227;
+        --ng-gold-light: #e6c86e;
+        --ng-gold-grad: linear-gradient(135deg, #e6c86e 0%, #c9a227 55%, #9c7a1a 100%);
+        color-scheme: dark;
       }
-      div:has(> [id^="torneo-field-"]) > div:first-child {
-        background: #eecf8d;
+      html,
+      body {
+        background: radial-gradient(1200px 700px at 15% -10%, #171a20 0%, var(--ng-bg) 60%) fixed !important;
+        color: var(--ng-text);
+      }
+      [class*="AppMainContainer"],
+      [class*="EditorContainer"],
+      [class*="CollectionContainer"] { background: transparent !important; }
+
+      ::-webkit-scrollbar { width: 10px; height: 10px; }
+      ::-webkit-scrollbar-track { background: var(--ng-bg); }
+      ::-webkit-scrollbar-thumb { background: var(--ng-panel-3); border-radius: 10px; border: 2px solid var(--ng-bg); }
+
+      /* Header principale */
+      [class*="-AppHeader-css"] {
+        background: rgba(19, 22, 27, 0.92) !important;
+        border-bottom: 1px solid var(--ng-border);
+        box-shadow: none !important;
+        backdrop-filter: blur(8px);
+      }
+      [class*="AppHeaderNavLink"],
+      [class*="AppHeaderButton"] { color: var(--ng-muted) !important; background: transparent !important; }
+      [class*="AppHeaderNavLink"]:hover,
+      [class*="AppHeaderButton"]:hover,
+      .header-link-active { color: var(--ng-gold-light) !important; }
+      .header-link-active svg path { fill: currentColor; }
+      [class*="AvatarPlaceholderIcon"] { background: var(--ng-panel-3) !important; color: var(--ng-muted) !important; }
+
+      /* Bottoni principali (nuovo contenuto, pubblica): oro */
+      [class*="AppHeaderQuickNewButton"],
+      [class*="CollectionTopNewButton"],
+      [class*="LoginButton"],
+      [class*="InsertButton"]:not([disabled]),
+      [class*="ToolbarContainer"] [class*="StyledDropdownButton"] {
+        background: var(--ng-gold-grad) !important;
+        color: #17130a !important;
+        border: 0 !important;
+        box-shadow: 0 6px 18px -8px rgba(201, 162, 39, 0.6) !important;
+        font-weight: 700 !important;
+      }
+      [class*="ToolbarContainer"] [class*="StyledDropdownButton"]::after { border-top-color: #17130a !important; }
+      [class*="DeleteButton"] {
+        background: rgba(179, 58, 50, 0.14) !important;
+        color: #f0a39c !important;
+        border: 1px solid rgba(179, 58, 50, 0.35) !important;
+      }
+      [class*="DeleteButton"]:hover:not([disabled]) { background: rgba(179, 58, 50, 0.3) !important; }
+      [class*="UploadButton"],
+      button[class*="ActionButton"],
+      [class*="ControlButton-css"],
+      [class*="ViewControlsButton"],
+      [class*="InsertButton"][disabled] {
+        background: var(--ng-panel-2) !important;
+        color: var(--ng-text) !important;
+        border: 1px solid var(--ng-border) !important;
+      }
+      [class*="ViewControlsButton"] { border: 0 !important; background: transparent !important; color: var(--ng-muted) !important; }
+
+      /* Card, sidebar, liste */
+      [class*="card-card"] {
+        background: var(--ng-panel) !important;
+        color: var(--ng-text) !important;
+        border: 1px solid var(--ng-border) !important;
+        box-shadow: 0 12px 30px -20px rgba(0, 0, 0, 0.9) !important;
+      }
+      [class*="cardTopHeading"],
+      [class*="ListCardTitle"],
+      [class*="LibraryTitle"] { color: var(--ng-text) !important; }
+      [class*="ListCardLink"]:hover { background: var(--ng-panel-2) !important; }
+      [class*="SidebarNavLink"] { color: var(--ng-muted) !important; border-left-color: transparent !important; }
+      [class*="SidebarNavLink"]:hover,
+      .sidebar-active {
+        color: var(--ng-gold-light) !important;
+        background: var(--ng-panel-2) !important;
+        border-left-color: var(--ng-gold) !important;
+      }
+      [class*="SearchInput"] {
+        background: var(--ng-bg) !important;
+        color: var(--ng-text) !important;
+        border: 1px solid var(--ng-border) !important;
       }
 
-      div:has(> [id^="serie-field-"]) {
-        border: 2px solid #8b6bb0;
-        border-radius: 10px;
-        background: #f2ecfa;
-        overflow: hidden;
-        margin-bottom: 16px;
+      /* Barra dell'editor */
+      [class*="ToolbarContainer"] {
+        background: rgba(19, 22, 27, 0.95) !important;
+        border-bottom: 1px solid var(--ng-border) !important;
+        box-shadow: none !important;
       }
-      div:has(> [id^="serie-field-"]) > div:first-child {
-        background: #d6c3ec;
-      }
-
-      div:has(> [id^="dettagli-field-"]) {
-        border: 2px solid #3f9e77;
-        border-radius: 10px;
-        background: #e7f6ef;
-        overflow: hidden;
-        margin-bottom: 16px;
-      }
-      div:has(> [id^="dettagli-field-"]) > div:first-child {
-        background: #b7e4cd;
+      [class*="ToolbarSection"] { border-color: var(--ng-border) !important; }
+      [class*="BackArrow"],
+      [class*="BackCollection"] { color: var(--ng-text) !important; }
+      [class*="NoPreviewContainer"] {
+        background: transparent !important;
+        border: 0 !important;
+        box-shadow: none !important;
       }
 
-      /* Giorno/Mese/Anno/Ora affiancati su una riga (il nome del torneo
-         resta a piena larghezza sulla riga sopra). */
-      [id^="torneo-field-"] > div:last-child {
+      /* Menu a tendina */
+      [class*="DropdownList"] {
+        background: var(--ng-panel-2) !important;
+        border: 1px solid var(--ng-border) !important;
+        box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.8) !important;
+      }
+      [class*="StyledMenuItem"] { color: var(--ng-text) !important; background: transparent !important; }
+      [class*="StyledMenuItem"]:hover,
+      [class*="StyledMenuItem"]:focus { background: var(--ng-panel-3) !important; color: var(--ng-gold-light) !important; }
+
+      /* Libreria media */
+      .ReactModal__Overlay { background: rgba(5, 6, 8, 0.75) !important; backdrop-filter: blur(3px); }
+      [class*="StyledModal"] {
+        background: var(--ng-panel) !important;
+        color: var(--ng-text) !important;
+        border: 1px solid var(--ng-border) !important;
+      }
+      [class*="CloseButton"] { background: var(--ng-panel-3) !important; color: var(--ng-text) !important; }
+      [class*="-Card "],
+      [class$="-Card"] {
+        position: relative;
+        background: var(--ng-panel-2) !important;
+        border-color: var(--ng-border) !important;
+        transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+      }
+      [class*="-Card "]:hover,
+      [class$="-Card"]:hover { border-color: #3a414b !important; }
+      /* Immagine selezionata (classe aggiunta dallo script, vedi markSelectedCards) */
+      .ng-card-selected {
+        border-color: var(--ng-gold) !important;
+        box-shadow: 0 0 0 1px var(--ng-gold), 0 0 26px 2px rgba(201, 162, 39, 0.45) !important;
+        transform: translateY(-2px);
+      }
+      .ng-card-selected::after {
+        content: "✓";
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: var(--ng-gold-grad);
+        color: #17130a;
+        font-weight: 800;
+        font-size: 15px;
+        line-height: 26px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+      }
+      [class*="CardText"] { color: var(--ng-muted) !important; }
+
+      /* Pagina di accesso */
+      [class*="StyledAuthenticationPage"] { background: transparent !important; }
+      [class*="DecapLogoIcon"] svg { filter: invert(1) hue-rotate(180deg) brightness(1.1); }
+
+      /* Campi standard di Decap (form Serie, News, Classifiche) */
+      [class*="ControlContainer"]:not(.ng-cell) input,
+      [class*="ControlContainer"]:not(.ng-cell) textarea,
+      [class*="ControlContainer"]:not(.ng-cell) select {
+        background: var(--ng-bg) !important;
+        color: var(--ng-text) !important;
+        border-color: var(--ng-border) !important;
+      }
+      [class*="ControlContainer"]:not(.ng-cell) [class*="FieldLabel"] {
+        background: var(--ng-panel-3) !important;
+        color: var(--ng-muted) !important;
+        border: 0 !important;
+        box-shadow: none !important;
+      }
+      [class*="ControlContainer"]:not(.ng-cell) [class*="FieldLabel"]::before,
+      [class*="ControlContainer"]:not(.ng-cell) [class*="FieldLabel"]::after { display: none !important; }
+      [class*="ControlContainer"]:not(.ng-cell) > div {
+        background-color: transparent !important;
+        border-color: var(--ng-border) !important;
+      }
+      [class*="TopBarContainer"],
+      [class*="StyledListItemTopBar"] {
+        background: var(--ng-panel-3) !important;
+        color: var(--ng-muted) !important;
+      }
+      [class*="ExpandButton"],
+      [class*="TopBarButton"],
+      [class*="NestedObjectLabel"] { color: var(--ng-muted) !important; }
+      [class*="AddButton"] { background: var(--ng-panel-3) !important; color: var(--ng-text) !important; }
+      [class*="ListItem-listControlItem"] { background: transparent !important; }
+      [class*="FileWidgetButton"] { background: var(--ng-panel-3) !important; color: var(--ng-text) !important; }
+      [class*="StyledSplitPane"] { background: transparent !important; border: 0 !important; }
+      [class*="PreviewPaneContainer"] { background: var(--ng-panel) !important; }
+      [class*="ButtonRound"] { background: var(--ng-panel-2) !important; color: var(--ng-gold-light) !important; border: 1px solid var(--ng-border) !important; }
+      [class*="RefreshPreviewButton"] { color: var(--ng-muted) !important; }
+      .header-link-active * { color: var(--ng-gold-light) !important; }
+      .ng-grid { padding-top: 26px !important; }
+
+      /* =====================================================================
+         FORM TORNEI: sezioni disegnate dai widget "ng-*" (script sotto).
+         Ogni sezione ha una tinta (--h) desaturata e 3 toni: sfondo sezione
+         sfumato, etichetta del campo, campo di testo.
+         ===================================================================== */
+      .ng-sec--nome { --h: 202; --s: 30%; }
+      .ng-sec--dettagli { --h: 152; --s: 20%; }
+      .ng-sec--locandina { --h: 262; --s: 18%; }
+      .ng-sec--series { --h: 36; --s: 34%; }
+      .ng-sec--descrizione,
+      .ng-sec--testo { --h: 342; --s: 22%; }
+
+      .ng-sec {
+        position: relative;
+        background:
+          radial-gradient(140% 120% at 0% 0%, hsl(var(--h) var(--s) 30% / 0.95) 0%, transparent 60%),
+          linear-gradient(160deg, hsl(var(--h) var(--s) 22%) 0%, hsl(var(--h) calc(var(--s) * 0.6) 13%) 100%);
+        border: 1px solid hsl(var(--h) var(--s) 42% / 0.5);
+        border-radius: 16px;
+        padding: 18px 20px 10px;
+        box-shadow:
+          inset 0 1px 0 hsl(var(--h) var(--s) 60% / 0.12),
+          0 22px 44px -26px rgba(0, 0, 0, 0.9);
+        font-family: inherit;
+      }
+      .ng-sec__title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: hsl(var(--h) 40% 86%);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        margin-bottom: 16px;
+      }
+      .ng-sec__title::before {
+        content: "";
+        width: 4px;
+        height: 16px;
+        border-radius: 2px;
+        background: linear-gradient(180deg, hsl(var(--h) 55% 72%), hsl(var(--h) 45% 42%));
+        box-shadow: 0 0 12px hsl(var(--h) 55% 60% / 0.5);
+      }
+      .ng-row { display: flex; flex-wrap: wrap; gap: 10px; }
+      .ng-row > .ng-field { flex: 1 1 110px; }
+      .ng-row--date > .ng-field:nth-child(-n + 2) { flex: 1 1 80px; }
+      .ng-row--date > .ng-field:nth-child(3) { flex: 1 1 100px; }
+      .ng-row--date > .ng-field:nth-child(4) { flex: 1 1 140px; }
+      .ng-field {
+        display: flex;
+        flex-direction: column;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 10px;
+        background: hsl(var(--h) 22% 10% / 0.5);
+        border: 1px solid hsl(var(--h) var(--s) 48% / 0.3);
+        transition: border-color 0.15s, box-shadow 0.15s;
+      }
+      .ng-field:focus-within {
+        border-color: hsl(var(--h) 50% 62% / 0.75);
+        box-shadow: 0 0 0 3px hsl(var(--h) 50% 55% / 0.16);
+      }
+      .ng-field__label {
+        background: linear-gradient(90deg, hsl(var(--h) var(--s) 38% / 0.65), hsl(var(--h) var(--s) 30% / 0.2));
+        color: hsl(var(--h) 45% 84%);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        padding: 6px 11px;
+        white-space: nowrap;
+      }
+      .ng-field input,
+      .ng-field select,
+      .ng-field textarea {
+        background: transparent;
+        color: #f1ede4;
+        border: 0;
+        border-radius: 0;
+        padding: 10px 11px;
+        font-size: 15px;
+        font-family: inherit;
+        outline: none;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .ng-field input::placeholder,
+      .ng-field textarea::placeholder { color: hsl(var(--h) 12% 45%); }
+      .ng-field select { cursor: pointer; }
+      .ng-field option { background: var(--ng-panel-2); color: var(--ng-text); }
+      .ng-field textarea { min-height: 140px; resize: vertical; line-height: 1.5; }
+
+      .ng-pool {
         display: flex;
         flex-wrap: wrap;
         gap: 12px;
-      }
-      [id^="torneo-field-"] > div:last-child > div:first-child {
-        flex: 1 1 100%;
-      }
-      [id^="torneo-field-"] > div:last-child > div:not(:first-child) {
-        flex: 1 1 130px;
-        min-width: 110px;
-      }
-
-      /* Serie / Festival: gruppi "Informazioni" (blu) e "Media" (rosa) */
-      div:has(> [id^="informazioni-field-"]) {
-        border: 2px solid #4f7cbb;
+        background: hsl(var(--h) 22% 10% / 0.5);
+        border: 1px solid hsl(var(--h) var(--s) 48% / 0.3);
         border-radius: 10px;
-        background: #e9f0fb;
+        padding: 12px;
+        margin-bottom: 10px;
+      }
+      .ng-thumb,
+      .ng-add {
+        position: relative;
+        width: 110px;
+        height: 150px;
+        border-radius: 8px;
         overflow: hidden;
-        margin-bottom: 16px;
+        flex: none;
       }
-      div:has(> [id^="informazioni-field-"]) > div:first-child {
-        background: #bcd2ef;
+      .ng-thumb {
+        background: #000;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 10px 20px -12px rgba(0, 0, 0, 0.9);
+        transition: transform 0.15s;
       }
-
-      div:has(> [id^="media-field-"]) {
-        border: 2px solid #c0577e;
-        border-radius: 10px;
-        background: #fbeaf0;
-        overflow: hidden;
-        margin-bottom: 16px;
-      }
-      div:has(> [id^="media-field-"]) > div:first-child {
-        background: #f0bdd0;
-      }
-
-      /* Data inizio/fine della serie: Giorno/Mese/Anno affiancati su una riga */
-      [id^="inizio-field-"] > div:last-child,
-      [id^="fine-field-"] > div:last-child {
+      .ng-thumb:hover { transform: translateY(-2px); }
+      .ng-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+      .ng-thumb__del {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        width: 28px;
+        height: 28px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 50%;
+        background: rgba(11, 13, 16, 0.78);
+        backdrop-filter: blur(4px);
+        color: #f0a39c;
+        cursor: pointer;
+        padding: 0;
         display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.85;
+        transition: background 0.15s, opacity 0.15s;
       }
-      [id^="inizio-field-"] > div:last-child > div,
-      [id^="fine-field-"] > div:last-child > div {
-        flex: 1 1 130px;
-        min-width: 110px;
+      .ng-thumb:hover .ng-thumb__del { opacity: 1; }
+      .ng-thumb__del:hover { background: #a8352d; color: #fff; }
+      .ng-add {
+        border: 1.5px dashed hsl(var(--h) 40% 60% / 0.55);
+        background: hsl(var(--h) var(--s) 22% / 0.18);
+        color: hsl(var(--h) 45% 78%);
+        font-size: 40px;
+        font-weight: 200;
+        cursor: pointer;
+        transition: background 0.15s, border-color 0.15s;
+      }
+      .ng-add:hover {
+        background: hsl(var(--h) var(--s) 30% / 0.35);
+        border-color: hsl(var(--h) 50% 70% / 0.8);
+      }
+
+      /* Griglia delle sezioni: contenitore e celle marcati dallo script
+         (ng-grid / ng-cell). */
+      .ng-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr;
+        gap: 22px;
+        align-items: start;
+        max-width: 1200px !important;
+        background: transparent !important;
+      }
+      .ng-grid > :not(.ng-cell),
+      .ng-grid > .ng-cell[data-ng-cell="descrizione"] { grid-column: 1 / -1; }
+      .ng-cell {
+        border: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+      }
+      /* Etichetta standard di Decap (con il suffisso "(optional)"): il
+         titolo lo disegna già la sezione. I widget ng-* non usano <label>. */
+      .ng-cell label { display: none !important; }
+      /* Form series (nessuna sezione SERIES): NOME E DATE a sinistra, DETTAGLI
+         e LOCANDINA impilati a destra, DESCRIZIONE a tutta larghezza sotto. */
+      .ng-grid:not(:has(> [data-ng-cell="series"])) {
+        grid-template-areas:
+          "nome dettagli"
+          "nome locandina"
+          "descrizione descrizione";
+      }
+      .ng-grid:not(:has(> [data-ng-cell="series"])) > [data-ng-cell="nome"] { grid-area: nome; }
+      .ng-grid:not(:has(> [data-ng-cell="series"])) > [data-ng-cell="dettagli"] { grid-area: dettagli; }
+      .ng-grid:not(:has(> [data-ng-cell="series"])) > [data-ng-cell="locandina"] { grid-area: locandina; }
+      .ng-grid:not(:has(> [data-ng-cell="series"])) > [data-ng-cell="descrizione"] { grid-area: descrizione; }
+      @media (max-width: 900px) {
+        .ng-grid { grid-template-columns: 1fr; }
+        .ng-grid:not(:has(> [data-ng-cell="series"])) { grid-template-areas: none; }
+        .ng-grid:not(:has(> [data-ng-cell="series"])) > [data-ng-cell] { grid-area: auto !important; }
+      }
+
+      .ng-sec--classifica { --h: 44; --s: 30%; }
+      .ng-field textarea.ng-short { min-height: 80px; }
+      .ng-field textarea.ng-tall { min-height: 300px; }
+      .ng-grow { flex: 1 1 280px; }
+      .ng-row--classifica { align-items: flex-end; gap: 16px; }
+
+      /* Interruttore IN CORSO / CONCLUSA */
+      .ng-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        height: 64px;
+        margin-bottom: 10px;
+        padding: 0 16px 0 12px;
+        border-radius: 10px;
+        border: 1px solid hsl(var(--h) var(--s) 48% / 0.3);
+        background: hsl(var(--h) 22% 10% / 0.5);
+        color: hsl(var(--h) 20% 70%);
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: 0.1em;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .ng-toggle__track {
+        position: relative;
+        width: 42px;
+        height: 24px;
+        border-radius: 12px;
+        background: hsl(var(--h) 10% 25%);
+        transition: background 0.2s;
+        flex: none;
+      }
+      .ng-toggle__track::after {
+        content: "";
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #c9ccd3;
+        transition: transform 0.2s, background 0.2s;
+      }
+      .ng-toggle--on { color: var(--ng-gold-light); }
+      .ng-toggle--on .ng-toggle__track { background: var(--ng-gold-grad); }
+      .ng-toggle--on .ng-toggle__track::after { transform: translateX(18px); background: #fff; }
+
+      /* Tabella classifica */
+      .ng-table { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+      .ng-trow {
+        display: grid;
+        grid-template-columns: 40px minmax(140px, 1fr) 110px 90px 112px;
+        gap: 8px;
+        align-items: center;
+      }
+      .ng-thead span {
+        color: hsl(var(--h) 40% 80%);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        padding: 0 4px;
+      }
+      .ng-tinput {
+        background: hsl(var(--h) 22% 10% / 0.5);
+        border: 1px solid hsl(var(--h) var(--s) 48% / 0.3);
+        border-radius: 8px;
+        color: #f1ede4;
+        padding: 9px 10px;
+        font: inherit;
+        font-size: 14px;
+        outline: none;
+        min-width: 0;
+      }
+      .ng-tinput:focus {
+        border-color: hsl(var(--h) 50% 62% / 0.75);
+        box-shadow: 0 0 0 3px hsl(var(--h) 50% 55% / 0.16);
+      }
+      .ng-tinput::placeholder { color: hsl(var(--h) 12% 45%); }
+      .ng-pos {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 14px;
+        background: hsl(var(--h) var(--s) 30% / 0.45);
+        color: hsl(var(--h) 40% 85%);
+      }
+      .ng-pos--1 { background: var(--ng-gold-grad); color: #17130a; box-shadow: 0 0 14px rgba(201, 162, 39, 0.4); }
+      .ng-pos--2 { background: linear-gradient(135deg, #eef0f3, #9aa1ab); color: #17191d; }
+      .ng-pos--3 { background: linear-gradient(135deg, #e3a970, #8a5a2b); color: #1b1006; }
+      .ng-tactions { display: flex; gap: 6px; justify-content: flex-end; }
+      .ng-icon-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        border: 1px solid hsl(var(--h) var(--s) 48% / 0.3);
+        background: transparent;
+        color: hsl(var(--h) 40% 80%);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        padding: 0;
+      }
+      .ng-icon-btn:hover:not([disabled]) { background: hsl(var(--h) var(--s) 30% / 0.4); }
+      .ng-icon-btn[disabled] { opacity: 0.3; cursor: default; }
+      .ng-icon-btn--danger { color: #f0a39c; }
+      .ng-icon-btn--danger:hover { background: #a8352d !important; color: #fff; }
+      .ng-tfoot { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+      .ng-btn {
+        padding: 10px 16px;
+        border-radius: 9px;
+        border: 1px solid hsl(var(--h) var(--s) 48% / 0.4);
+        background: hsl(var(--h) var(--s) 22% / 0.3);
+        color: hsl(var(--h) 45% 82%);
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: 0.1em;
+        cursor: pointer;
+      }
+      .ng-btn:hover { background: hsl(var(--h) var(--s) 30% / 0.45); }
+      .ng-btn--add { border-style: dashed; }
+      @media (max-width: 700px) {
+        .ng-trow { grid-template-columns: 34px minmax(0, 1fr) 64px 56px; }
+        .ng-tactions { grid-column: 1 / -1; }
+        .ng-thead span:last-child { display: none; }
+      }
+
+      /* Form news: TITOLO E DATA e DETTAGLI affiancati (stessa altezza),
+         IMMAGINI e TESTO a tutta larghezza sotto. */
+      .ng-grid:has(> [data-ng-cell="testo"]) {
+        grid-template-areas: "nome dettagli" "locandina locandina" "testo testo" !important;
+        align-items: stretch;
+      }
+      .ng-grid:has(> [data-ng-cell="testo"]) > [data-ng-cell="nome"] { grid-area: nome !important; }
+      .ng-grid:has(> [data-ng-cell="testo"]) > [data-ng-cell="dettagli"] { grid-area: dettagli !important; }
+      .ng-grid:has(> [data-ng-cell="testo"]) > [data-ng-cell="locandina"] { grid-area: locandina !important; }
+      .ng-grid:has(> [data-ng-cell="testo"]) > [data-ng-cell="testo"] { grid-area: testo !important; }
+      .ng-grid:has(> [data-ng-cell="series"]) { align-items: stretch; }
+      /* Sezioni sulla stessa riga: stessa altezza */
+      .ng-cell { display: flex !important; flex-direction: column; }
+      .ng-cell > .ng-sec { flex: 1 1 auto; }
+
+      /* Form classifiche: sezioni a tutta larghezza, una sotto l'altra */
+      .ng-grid:has(> [data-ng-cell="classifica"]) { grid-template-areas: none !important; }
+      .ng-grid:has(> [data-ng-cell="classifica"]) > .ng-cell { grid-area: auto !important; grid-column: 1 / -1 !important; }
+
+      /* Sotto-titolo dentro una sezione (es. DATA INIZIO / DATA FINE delle series) */
+      .ng-subtitle {
+        color: hsl(var(--h) 35% 76%);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        margin: 6px 0 8px 2px;
+        opacity: 0.85;
       }
     </style>
   </head>
   <body>
     <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+    <script>
+      // Widget personalizzati del form TORNEI (vedi config.yml, collection
+      // "eventi"). Ogni widget disegna da sé la propria sezione colorata, così
+      // etichette, colori e layout non dipendono dal markup interno di Decap.
+      // I valori salvati restano identici a prima (torneo/dettagli/serie come
+      // oggetti, images come lista, description come testo): lo schema Zod del
+      // sito (src/lib/schemas/event.ts) non cambia formato.
+      (function () {
+        var DEFAULT_IMAGE = "/eventi/placeholder-torneo.svg";
+
+        function plain(value) {
+          if (value && typeof value.toJS === "function") return value.toJS();
+          return value == null ? {} : value;
+        }
+
+        // Decap si aspetta valori Immutable: field.clear() fornisce una Map
+        // vuota senza dipendere da un Immutable globale. I campi vuoti vengono
+        // omessi, così lo schema li tratta come "non specificati".
+        function toMap(field, obj) {
+          var map = field.clear();
+          Object.keys(obj).forEach(function (key) {
+            var v = obj[key];
+            if (v !== undefined && v !== null && v !== "") map = map.set(key, v);
+          });
+          return map;
+        }
+
+        function toList(field, arr) {
+          var list = field.toList().clear();
+          arr.forEach(function (item) { list = list.push(item); });
+          return list;
+        }
+
+        function invalid(message) {
+          return { error: { message: message } };
+        }
+
+        // Dispone le sezioni a griglia: trova il contenitore comune a tutte le
+        // sezioni e marca come "cella" il figlio diretto che contiene ciascuna.
+        var layoutQueued = false;
+        function scheduleLayout() {
+          if (layoutQueued) return;
+          layoutQueued = true;
+          requestAnimationFrame(function () {
+            layoutQueued = false;
+            var sections = Array.prototype.slice.call(document.querySelectorAll(".ng-sec"));
+            if (sections.length < 2) return;
+            var container = sections[0].parentElement;
+            while (container && !sections.every(function (s) { return container.contains(s); })) {
+              container = container.parentElement;
+            }
+            if (!container) return;
+            Array.prototype.forEach.call(document.querySelectorAll(".ng-grid"), function (el) {
+              if (el !== container) el.classList.remove("ng-grid");
+            });
+            container.classList.add("ng-grid");
+            sections.forEach(function (section) {
+              var cell = section;
+              while (cell.parentElement !== container) cell = cell.parentElement;
+              cell.classList.add("ng-cell");
+              cell.setAttribute("data-ng-cell", section.getAttribute("data-ng-name"));
+            });
+          });
+        }
+
+        function section(name, title, children) {
+          return h(
+            "div",
+            { className: "ng-sec ng-sec--" + name, "data-ng-name": name },
+            h("div", { className: "ng-sec__title" }, title),
+            children
+          );
+        }
+
+        function field(label, control) {
+          return h("div", { className: "ng-field" }, h("span", { className: "ng-field__label" }, label), control);
+        }
+
+        // ---------------- NOME E DATA ----------------
+        var TorneoControl = createClass({
+          componentDidMount: scheduleLayout,
+          set: function (key, v) {
+            var data = plain(this.props.value);
+            data[key] = v;
+            this.props.onChange(toMap(this.props.field, data));
+          },
+          input: function (key, placeholder, maxLength) {
+            var self = this;
+            return h("input", {
+              type: "text",
+              value: plain(this.props.value)[key] || "",
+              placeholder: placeholder,
+              maxLength: maxLength,
+              onChange: function (e) { self.set(key, e.target.value); },
+            });
+          },
+          isValid: function () {
+            var d = plain(this.props.value);
+            if (!d.title || d.title.trim().length < 3) return invalid("Il nome del torneo deve avere almeno 3 caratteri");
+            if (!/^(0[1-9]|[12]\d|3[01])$/.test(d.day || "")) return invalid("Giorno nel formato GG, es. 05");
+            if (!/^(0[1-9]|1[0-2])$/.test(d.month || "")) return invalid("Mese nel formato MM, es. 09");
+            if (!/^\d{4}$/.test(d.year || "")) return invalid("Anno nel formato AAAA, es. 2026");
+            var day = Number(d.day), month = Number(d.month), year = Number(d.year);
+            var date = new Date(Date.UTC(year, month - 1, day));
+            if (date.getUTCDate() !== day || date.getUTCMonth() !== month - 1) return invalid("La data inserita non esiste nel calendario");
+            if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(d.time || "")) return invalid("Orario nel formato HH:MM, es. 20:00");
+            return true;
+          },
+          render: function () {
+            return section("nome", "NOME E DATA", [
+              h("div", { key: "t" }, field("NOME DEL TORNEO", this.input("title", "es. Deepstack Garantito 2000"))),
+              h(
+                "div",
+                { className: "ng-row ng-row--date", key: "d" },
+                field("GIORNO (GG)", this.input("day", "05", 2)),
+                field("MESE (MM)", this.input("month", "09", 2)),
+                field("ANNO (AAAA)", this.input("year", "2026", 4)),
+                field("ORARIO (HH:MM)", this.input("time", "20:00", 5))
+              ),
+            ]);
+          },
+        });
+
+        // ---------------- NOME E DATE (series) ----------------
+        function dateError(parts, label) {
+          parts = parts || {};
+          if (!/^(0[1-9]|[12]\d|3[01])$/.test(parts.day || "")) return label + ": giorno nel formato GG, es. 05";
+          if (!/^(0[1-9]|1[0-2])$/.test(parts.month || "")) return label + ": mese nel formato MM, es. 09";
+          if (!/^\d{4}$/.test(parts.year || "")) return label + ": anno nel formato AAAA, es. 2026";
+          var day = Number(parts.day), month = Number(parts.month), year = Number(parts.year);
+          var date = new Date(Date.UTC(year, month - 1, day));
+          if (date.getUTCDate() !== day || date.getUTCMonth() !== month - 1) return label + ": la data non esiste nel calendario";
+          return null;
+        }
+
+        var SerieInfoControl = createClass({
+          componentDidMount: scheduleLayout,
+          emit: function (data) {
+            var field = this.props.field;
+            var map = toMap(field, { title: data.title });
+            ["inizio", "fine"].forEach(function (key) {
+              var inner = toMap(field, data[key] || {});
+              if (inner.size) map = map.set(key, inner);
+            });
+            this.props.onChange(map);
+          },
+          setTitle: function (v) {
+            var data = plain(this.props.value);
+            data.title = v;
+            this.emit(data);
+          },
+          setDate: function (which, key, v) {
+            var data = plain(this.props.value);
+            data[which] = Object.assign({}, data[which]);
+            data[which][key] = v;
+            this.emit(data);
+          },
+          isValid: function () {
+            var d = plain(this.props.value);
+            if (!d.title || d.title.trim().length < 3) return invalid("Il nome della series deve avere almeno 3 caratteri");
+            var err = dateError(d.inizio, "Data inizio") || dateError(d.fine, "Data fine");
+            if (err) return invalid(err);
+            var start = d.inizio.year + d.inizio.month + d.inizio.day;
+            var end = d.fine.year + d.fine.month + d.fine.day;
+            if (end < start) return invalid("La data di fine non può essere precedente a quella di inizio");
+            return true;
+          },
+          dateRow: function (which, caption) {
+            var self = this;
+            var parts = plain(this.props.value)[which] || {};
+            function input(key, placeholder, maxLength) {
+              return h("input", {
+                type: "text",
+                value: parts[key] || "",
+                placeholder: placeholder,
+                maxLength: maxLength,
+                onChange: function (e) { self.setDate(which, key, e.target.value); },
+              });
+            }
+            return h(
+              "div",
+              { key: which },
+              h("div", { className: "ng-subtitle" }, caption),
+              h(
+                "div",
+                { className: "ng-row ng-row--date" },
+                field("GIORNO (GG)", input("day", "15", 2)),
+                field("MESE (MM)", input("month", "09", 2)),
+                field("ANNO (AAAA)", input("year", "2026", 4))
+              )
+            );
+          },
+          render: function () {
+            var self = this;
+            return section("nome", "NOME E DATE", [
+              h(
+                "div",
+                { key: "t" },
+                field(
+                  "NOME DELLA SERIES",
+                  h("input", {
+                    type: "text",
+                    value: plain(this.props.value).title || "",
+                    placeholder: "es. The Gladiator",
+                    onChange: function (e) { self.setTitle(e.target.value); },
+                  })
+                )
+              ),
+              this.dateRow("inizio", "DATA INIZIO"),
+              this.dateRow("fine", "DATA FINE (FINAL DAY)"),
+            ]);
+          },
+        });
+
+        // ---------------- DETTAGLI ----------------
+        // Sezione di campi numerici: stessa grafica per tornei e series, cambia
+        // solo l'elenco dei campi (e quale è obbligatorio).
+        function numberSection(fields, requiredKey, requiredMessage) {
+          return createClass({
+            // Testo digitato tenuto in stato locale: un input numerico
+            // controllato direttamente dal numero perderebbe stati intermedi
+            // come "12,".
+            getInitialState: function () {
+              var d = plain(this.props.value);
+              var text = {};
+              fields.forEach(function (f) { text[f.key] = d[f.key] == null ? "" : String(d[f.key]); });
+              return { text: text };
+            },
+            componentDidMount: scheduleLayout,
+            change: function (f, raw) {
+              var text = Object.assign({}, this.state.text);
+              text[f.key] = raw;
+              this.setState({ text: text });
+              var data = {};
+              fields.forEach(function (nf) {
+                var s = String(text[nf.key]).replace(",", ".").trim();
+                if (s === "") return;
+                var n = nf.int ? parseInt(s, 10) : parseFloat(s);
+                data[nf.key] = isNaN(n) ? s : n;
+              });
+              this.props.onChange(toMap(this.props.field, data));
+            },
+            isValid: function () {
+              var d = plain(this.props.value);
+              if (requiredKey && (typeof d[requiredKey] !== "number" || d[requiredKey] < 0)) return invalid(requiredMessage);
+              for (var i = 0; i < fields.length; i++) {
+                var f = fields[i];
+                if (d[f.key] != null && (typeof d[f.key] !== "number" || d[f.key] < 0)) {
+                  return invalid(f.label + " deve essere un numero valido");
+                }
+              }
+              return true;
+            },
+            render: function () {
+              var self = this;
+              return section(
+                "dettagli",
+                "DETTAGLI",
+                h(
+                  "div",
+                  { className: "ng-row" },
+                  fields.map(function (f) {
+                    return h(
+                      "div",
+                      { className: "ng-field", key: f.key, style: { flex: fields.length > 1 ? "1 1 45%" : "1 1 100%" } },
+                      h("span", { className: "ng-field__label" }, f.label),
+                      h("input", {
+                        type: "text",
+                        inputMode: f.int ? "numeric" : "decimal",
+                        value: self.state.text[f.key],
+                        onChange: function (e) { self.change(f, e.target.value); },
+                      })
+                    );
+                  })
+                )
+              );
+            },
+          });
+        }
+
+        var DettagliControl = numberSection(
+          [
+            { key: "buyIn", label: "BUY-IN", int: false },
+            { key: "guaranteed", label: "GARANTITO", int: false },
+            { key: "startingStack", label: "STACK", int: true },
+            { key: "levelDurationMinutes", label: "DURATA LIVELLI", int: true },
+          ],
+          "buyIn",
+          "Il buy-in è obbligatorio (numero in euro)"
+        );
+
+        var SerieDettagliControl = numberSection([{ key: "guaranteed", label: "GARANTITO", int: false }]);
+
+        // ---------------- LOCANDINA ----------------
+        // Pool di immagini inizialmente vuoto (= verrà usata la locandina di
+        // default, mai mostrata né salvata qui). "+" apre la libreria media e
+        // aggiunge in coda; il cestino rimuove la singola locandina.
+        var TRASH_ICON = h(
+          "svg",
+          { width: 16, height: 16, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2.2, strokeLinecap: "round", strokeLinejoin: "round" },
+          h("path", { d: "M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6" })
+        );
+
+        var LocandineControl = createClass({
+          getInitialState: function () {
+            return { urls: {} };
+          },
+          componentWillMount: function () {
+            this.controlID = window.crypto && crypto.randomUUID ? crypto.randomUUID() : "ng-" + Math.random().toString(36).slice(2);
+          },
+          componentDidMount: scheduleLayout,
+          // Decap ridisegna un widget solo se cambia il valore, salvo che il
+          // widget non decida da sé: qui serve anche quando la libreria media
+          // restituisce l'immagine scelta (come fa il widget "image" di Decap).
+          shouldComponentUpdate: function (nextProps, nextState) {
+            var inserted = nextProps.mediaPaths && nextProps.mediaPaths.get(this.controlID);
+            return (
+              nextProps.value !== this.props.value ||
+              nextProps.getAsset !== this.props.getAsset ||
+              (nextState !== undefined && nextState !== this.state) ||
+              !!inserted ||
+              (!inserted && !!this.lastInserted)
+            );
+          },
+          componentDidUpdate: function () {
+            var inserted = this.props.mediaPaths && this.props.mediaPaths.get(this.controlID);
+            if (!inserted) {
+              this.lastInserted = null;
+              return;
+            }
+            if (inserted === this.lastInserted) return;
+            this.lastInserted = inserted;
+            var added = typeof inserted === "string" ? [inserted] : plain(inserted);
+            this.props.onChange(toList(this.props.field, this.images().concat(added)));
+            this.props.onRemoveInsertedMedia(this.controlID);
+          },
+          componentWillUnmount: function () {
+            if (this.props.onRemoveMediaControl) this.props.onRemoveMediaControl(this.controlID);
+          },
+          images: function () {
+            var list = plain(this.props.value);
+            if (!Array.isArray(list)) list = typeof list === "string" ? [list] : [];
+            var defaultImage = this.props.field.get("default_image") || DEFAULT_IMAGE;
+            return list.filter(function (src) { return src && src !== defaultImage; });
+          },
+          // Per le immagini appena caricate ma non ancora pubblicate (backend
+          // GitHub), il percorso pubblico non esiste ancora: si chiede a Decap
+          // l'anteprima locale.
+          resolve: function (src) {
+            var self = this;
+            if (this.state.urls[src] !== undefined || !this.props.getAsset) return;
+            this.state.urls[src] = null;
+            try {
+              Promise.resolve(this.props.getAsset(src, this.props.field)).then(function (asset) {
+                var url = asset && (asset.url || String(asset));
+                if (url && url.indexOf("[object") !== 0) {
+                  var urls = Object.assign({}, self.state.urls);
+                  urls[src] = url;
+                  self.setState({ urls: urls });
+                }
+              });
+            } catch (e) {}
+          },
+          add: function (e) {
+            e.preventDefault();
+            this.props.onOpenMediaLibrary({
+              controlID: this.controlID,
+              forImage: true,
+              privateUpload: false,
+              value: "",
+              allowMultiple: true,
+              field: this.props.field,
+            });
+          },
+          remove: function (index) {
+            var list = this.images();
+            list.splice(index, 1);
+            this.props.onChange(toList(this.props.field, list));
+          },
+          render: function () {
+            var self = this;
+            var images = this.images();
+            var thumbs = images.map(function (src, i) {
+              self.resolve(src);
+              return h(
+                "div",
+                { className: "ng-thumb", key: src + i },
+                h("img", { src: self.state.urls[src] || src, alt: "Locandina " + (i + 1) }),
+                h(
+                  "button",
+                  {
+                    type: "button",
+                    className: "ng-thumb__del",
+                    title: "Rimuovi locandina",
+                    onClick: function () { self.remove(i); },
+                  },
+                  TRASH_ICON
+                )
+              );
+            });
+            thumbs.push(
+              h("button", { type: "button", className: "ng-add", key: "add", title: "Aggiungi locandina", onClick: this.add }, "+")
+            );
+            return section("locandina", this.props.field.get("label") || "LOCANDINA", h("div", { className: "ng-pool" }, thumbs));
+          },
+        });
+
+        // ---------------- SERIES ----------------
+        // Le serie arrivano dall'API del sito (stessa origine del pannello):
+        // gli slug sono quelli calcolati dal sito, gli stessi usati per
+        // collegare i flight alla pagina della serie.
+        var SeriesControl = createClass({
+          getInitialState: function () {
+            return { series: [] };
+          },
+          componentDidMount: function () {
+            var self = this;
+            scheduleLayout();
+            fetch("/api/serie")
+              .then(function (r) { return r.ok ? r.json() : []; })
+              .then(function (list) { self.setState({ series: list }); })
+              .catch(function () {});
+          },
+          set: function (key, v) {
+            var data = plain(this.props.value);
+            data[key] = v;
+            this.props.onChange(toMap(this.props.field, data));
+          },
+          render: function () {
+            var self = this;
+            var d = plain(this.props.value);
+            var options = [h("option", { key: "", value: "" }, "— Nessuna —")];
+            var known = false;
+            this.state.series.forEach(function (s) {
+              if (s.slug === d.seriesSlug) known = true;
+              options.push(h("option", { key: s.slug, value: s.slug }, s.title));
+            });
+            if (d.seriesSlug && !known) options.push(h("option", { key: d.seriesSlug, value: d.seriesSlug }, d.seriesSlug));
+            return section("series", "SERIES", [
+              h(
+                "div",
+                { key: "s" },
+                field(
+                  "SERIES A CUI APPARTIENE L'EVENTO",
+                  h("select", { value: d.seriesSlug || "", onChange: function (e) { self.set("seriesSlug", e.target.value); } }, options)
+                )
+              ),
+              h(
+                "div",
+                { key: "p" },
+                field(
+                  "FLIGHT (ES. DAY 1A)",
+                  h("input", {
+                    type: "text",
+                    value: d.phase || "",
+                    onChange: function (e) { self.set("phase", e.target.value); },
+                  })
+                )
+              ),
+            ]);
+          },
+        });
+
+        // ---------------- DESCRIZIONE ----------------
+        var DescrizioneControl = createClass({
+          componentDidMount: scheduleLayout,
+          // Facoltativa per i tornei, obbligatoria per le series (config.yml).
+          isValid: function () {
+            if (this.props.field.get("required") === false) return true;
+            var text = typeof this.props.value === "string" ? this.props.value.trim() : "";
+            if (text.length < 10) return invalid("La descrizione deve avere almeno 10 caratteri");
+            return true;
+          },
+          render: function () {
+            var self = this;
+            return section(
+              "descrizione",
+              "DESCRIZIONE",
+              field(
+                "TESTO",
+                h("textarea", {
+                  value: typeof this.props.value === "string" ? this.props.value : "",
+                  onChange: function (e) { self.props.onChange(e.target.value); },
+                })
+              )
+            );
+          },
+        });
+
+        // Tre caselle GG/MM/AAAA affiancate, condivise da news e classifiche.
+        function dateRow(parts, onSet) {
+          function input(key, placeholder, maxLength) {
+            return h("input", {
+              type: "text",
+              value: parts[key] || "",
+              placeholder: placeholder,
+              maxLength: maxLength,
+              onChange: function (e) { onSet(key, e.target.value); },
+            });
+          }
+          return h(
+            "div",
+            { className: "ng-row ng-row--date" },
+            field("GIORNO (GG)", input("day", "10", 2)),
+            field("MESE (MM)", input("month", "06", 2)),
+            field("ANNO (AAAA)", input("year", "2026", 4))
+          );
+        }
+
+        // Widget a oggetto piatto (titolo + data + altro): stessa logica di
+        // salvataggio per news e classifiche.
+        var flatObjectMixin = {
+          componentDidMount: scheduleLayout,
+          set: function (key, v) {
+            var data = plain(this.props.value);
+            data[key] = v;
+            this.props.onChange(toMap(this.props.field, data));
+          },
+        };
+
+        // ---------------- NEWS: TITOLO E DATA ----------------
+        var NewsInfoControl = createClass({
+          mixins: [flatObjectMixin],
+          isValid: function () {
+            var d = plain(this.props.value);
+            if (!d.title || d.title.trim().length < 3) return invalid("Il titolo deve avere almeno 3 caratteri");
+            var err = dateError(d, "Data");
+            return err ? invalid(err) : true;
+          },
+          render: function () {
+            var self = this;
+            var d = plain(this.props.value);
+            return section("nome", "TITOLO E DATA", [
+              h(
+                "div",
+                { key: "t" },
+                field(
+                  "TITOLO DELLA NEWS",
+                  h("input", {
+                    type: "text",
+                    value: d.title || "",
+                    placeholder: "es. Nuovi monitor in sala",
+                    onChange: function (e) { self.set("title", e.target.value); },
+                  })
+                )
+              ),
+              h("div", { key: "s", className: "ng-subtitle" }, "DATA DI PUBBLICAZIONE"),
+              h("div", { key: "d" }, dateRow(d, this.set)),
+            ]);
+          },
+        });
+
+        // ---------------- NEWS: DETTAGLI ----------------
+        var NEWS_CATEGORIES = ["Risultati", "Comunicato", "Evento speciale"];
+
+        var NewsDettagliControl = createClass({
+          mixins: [flatObjectMixin],
+          isValid: function () {
+            var d = plain(this.props.value);
+            if (NEWS_CATEGORIES.indexOf(d.category) === -1) return invalid("Scegli una categoria");
+            if (!d.excerpt || d.excerpt.trim().length < 10) return invalid("L'anteprima deve avere almeno 10 caratteri");
+            return true;
+          },
+          render: function () {
+            var self = this;
+            var d = plain(this.props.value);
+            var options = [h("option", { key: "", value: "", disabled: true }, "— Scegli —")].concat(
+              NEWS_CATEGORIES.map(function (c) { return h("option", { key: c, value: c }, c); })
+            );
+            return section("dettagli", "DETTAGLI", [
+              h(
+                "div",
+                { key: "c" },
+                field(
+                  "CATEGORIA",
+                  h("select", { value: d.category || "", onChange: function (e) { self.set("category", e.target.value); } }, options)
+                )
+              ),
+              h(
+                "div",
+                { key: "e" },
+                field(
+                  "ANTEPRIMA (MOSTRATA NELL'ELENCO NEWS)",
+                  h("textarea", {
+                    className: "ng-short",
+                    value: d.excerpt || "",
+                    placeholder: "Una o due frasi che riassumono la news",
+                    onChange: function (e) { self.set("excerpt", e.target.value); },
+                  })
+                )
+              ),
+            ]);
+          },
+        });
+
+        // ---------------- NEWS: TESTO ----------------
+        // Un unico riquadro di testo: i paragrafi si separano con una riga
+        // vuota. Si salva come lista di paragrafi (formato atteso dal sito).
+        function splitParagraphs(text) {
+          return text.split(/\n\s*\n/).map(function (p) { return p.trim(); }).filter(Boolean);
+        }
+
+        var NewsTestoControl = createClass({
+          getInitialState: function () {
+            var list = plain(this.props.value);
+            return { text: Array.isArray(list) ? list.join("\n\n") : "" };
+          },
+          componentDidMount: scheduleLayout,
+          // Il testo resta in stato locale (le righe vuote finali servono mentre
+          // si scrive); si riallinea solo se il valore cambia dall'esterno.
+          componentDidUpdate: function (prevProps) {
+            if (prevProps.value === this.props.value) return;
+            var list = plain(this.props.value);
+            var incoming = JSON.stringify(Array.isArray(list) ? list : []);
+            if (incoming !== JSON.stringify(splitParagraphs(this.state.text))) {
+              this.setState({ text: Array.isArray(list) ? list.join("\n\n") : "" });
+            }
+          },
+          change: function (text) {
+            this.setState({ text: text });
+            this.props.onChange(toList(this.props.field, splitParagraphs(text)));
+          },
+          isValid: function () {
+            return splitParagraphs(this.state.text).length > 0 ? true : invalid("Scrivi almeno un paragrafo");
+          },
+          render: function () {
+            var self = this;
+            return section(
+              "testo",
+              "TESTO",
+              field(
+                "PARAGRAFI — LASCIA UNA RIGA VUOTA TRA UN PARAGRAFO E L'ALTRO",
+                h("textarea", {
+                  className: "ng-tall",
+                  value: this.state.text,
+                  onChange: function (e) { self.change(e.target.value); },
+                })
+              )
+            );
+          },
+        });
+
+        // ---------------- CLASSIFICHE: NOME E DATA ----------------
+        var ClassificaInfoControl = createClass({
+          mixins: [flatObjectMixin],
+          isValid: function () {
+            var d = plain(this.props.value);
+            if (!d.title || d.title.trim().length < 3) return invalid("Il nome della classifica deve avere almeno 3 caratteri");
+            var err = dateError(d, "Data di aggiornamento");
+            return err ? invalid(err) : true;
+          },
+          render: function () {
+            var self = this;
+            var d = plain(this.props.value);
+            var active = d.seriesActive !== false;
+            return section("nome", "NOME E DATA", [
+              h(
+                "div",
+                { key: "t" },
+                field(
+                  "NOME DELLA CLASSIFICA",
+                  h("input", {
+                    type: "text",
+                    value: d.title || "",
+                    placeholder: "es. Classifica Generale 2026",
+                    onChange: function (e) { self.set("title", e.target.value); },
+                  })
+                )
+              ),
+              h(
+                "div",
+                { key: "r", className: "ng-row ng-row--classifica" },
+                h("div", { className: "ng-grow" }, h("div", { className: "ng-subtitle" }, "AGGIORNATA AL"), dateRow(d, this.set)),
+                h(
+                  "div",
+                  null,
+                  h("div", { className: "ng-subtitle" }, "STATO"),
+                  h(
+                    "button",
+                    {
+                      type: "button",
+                      className: "ng-toggle" + (active ? " ng-toggle--on" : ""),
+                      onClick: function () { self.set("seriesActive", !active); },
+                    },
+                    h("span", { className: "ng-toggle__track" }),
+                    active ? "IN CORSO" : "CONCLUSA"
+                  )
+                )
+              ),
+            ]);
+          },
+        });
+
+        // ---------------- CLASSIFICHE: RIGHE ----------------
+        // Tabella giocatori: la posizione è l'ordine delle righe (frecce per
+        // spostare, oppure "Ordina per punti"), non si scrive a mano.
+        function rowsFromValue(value) {
+          var list = plain(value);
+          if (!Array.isArray(list)) return [];
+          return list.map(function (r) {
+            return {
+              name: r.playerName || "",
+              points: r.points == null ? "" : String(r.points),
+              events: r.events == null ? "" : String(r.events),
+            };
+          });
+        }
+        function toNumber(text, int) {
+          var s = String(text).replace(",", ".").trim();
+          if (s === "") return null;
+          var n = int ? parseInt(s, 10) : parseFloat(s);
+          return isNaN(n) ? null : n;
+        }
+
+        var StandingsControl = createClass({
+          getInitialState: function () {
+            return { rows: rowsFromValue(this.props.value) };
+          },
+          componentDidMount: scheduleLayout,
+          componentDidUpdate: function (prevProps) {
+            if (prevProps.value === this.props.value || this.props.value === this.lastEmitted) return;
+            this.setState({ rows: rowsFromValue(this.props.value) });
+          },
+          emit: function (rows) {
+            var field = this.props.field;
+            this.setState({ rows: rows });
+            var list = toList(
+              field,
+              rows.map(function (r, i) {
+                return toMap(field, {
+                  position: i + 1,
+                  playerName: r.name.trim(),
+                  points: toNumber(r.points, false),
+                  events: toNumber(r.events, true) == null ? 0 : toNumber(r.events, true),
+                });
+              })
+            );
+            this.lastEmitted = list;
+            this.props.onChange(list);
+          },
+          update: function (i, key, v) {
+            var rows = this.state.rows.slice();
+            rows[i] = Object.assign({}, rows[i]);
+            rows[i][key] = v;
+            this.emit(rows);
+          },
+          move: function (i, delta) {
+            var j = i + delta;
+            var rows = this.state.rows.slice();
+            if (j < 0 || j >= rows.length) return;
+            var tmp = rows[i];
+            rows[i] = rows[j];
+            rows[j] = tmp;
+            this.emit(rows);
+          },
+          remove: function (i) {
+            var rows = this.state.rows.slice();
+            rows.splice(i, 1);
+            this.emit(rows);
+          },
+          add: function () {
+            this.emit(this.state.rows.concat([{ name: "", points: "", events: "" }]));
+          },
+          sortByPoints: function () {
+            var rows = this.state.rows.map(function (r, i) { return { r: r, i: i }; });
+            rows.sort(function (a, b) {
+              return (toNumber(b.r.points) || 0) - (toNumber(a.r.points) || 0) || a.i - b.i;
+            });
+            this.emit(rows.map(function (x) { return x.r; }));
+          },
+          isValid: function () {
+            var rows = this.state.rows;
+            if (rows.length === 0) return invalid("Aggiungi almeno un giocatore");
+            for (var i = 0; i < rows.length; i++) {
+              var r = rows[i];
+              if (r.name.trim().length < 2) return invalid("Riga " + (i + 1) + ": nome del giocatore mancante");
+              var p = toNumber(r.points, false);
+              if (p == null || p < 0) return invalid("Riga " + (i + 1) + ": punti mancanti o non validi");
+              var e = toNumber(r.events, true);
+              if (r.events.trim() !== "" && (e == null || e < 0)) return invalid("Riga " + (i + 1) + ": numero di tornei non valido");
+            }
+            return true;
+          },
+          render: function () {
+            var self = this;
+            var rows = this.state.rows;
+            var head = h(
+              "div",
+              { className: "ng-trow ng-thead", key: "head" },
+              h("span", null, "POS."),
+              h("span", null, "GIOCATORE"),
+              h("span", null, "PUNTI"),
+              h("span", null, "TORNEI"),
+              h("span", null, "")
+            );
+            var body = rows.map(function (r, i) {
+              return h(
+                "div",
+                { className: "ng-trow", key: i },
+                h("span", { className: "ng-pos" + (i < 3 ? " ng-pos--" + (i + 1) : "") }, i + 1),
+                h("input", { className: "ng-tinput", type: "text", value: r.name, placeholder: "Nome e iniziale", onChange: function (e) { self.update(i, "name", e.target.value); } }),
+                h("input", { className: "ng-tinput", type: "text", inputMode: "decimal", value: r.points, placeholder: "0", onChange: function (e) { self.update(i, "points", e.target.value); } }),
+                h("input", { className: "ng-tinput", type: "text", inputMode: "numeric", value: r.events, placeholder: "0", onChange: function (e) { self.update(i, "events", e.target.value); } }),
+                h(
+                  "span",
+                  { className: "ng-tactions" },
+                  h("button", { type: "button", className: "ng-icon-btn", title: "Sposta su", disabled: i === 0, onClick: function () { self.move(i, -1); } }, "↑"),
+                  h("button", { type: "button", className: "ng-icon-btn", title: "Sposta giù", disabled: i === rows.length - 1, onClick: function () { self.move(i, 1); } }, "↓"),
+                  h("button", { type: "button", className: "ng-icon-btn ng-icon-btn--danger", title: "Rimuovi giocatore", onClick: function () { self.remove(i); } }, TRASH_ICON)
+                )
+              );
+            });
+            var footer = h(
+              "div",
+              { className: "ng-tfoot", key: "foot" },
+              h("button", { type: "button", className: "ng-btn ng-btn--add", onClick: this.add }, "+ AGGIUNGI GIOCATORE"),
+              rows.length > 1 && h("button", { type: "button", className: "ng-btn", onClick: this.sortByPoints }, "ORDINA PER PUNTI")
+            );
+            return section("classifica", "CLASSIFICA", h("div", { className: "ng-table" }, [head].concat(body, [footer])));
+          },
+        });
+
+        // Anteprima (form Serie/News/Classifiche) coerente con il tema scuro.
+        CMS.registerPreviewStyle(
+          "body{background:#0b0d10;color:#e8e3d8;font-family:system-ui,sans-serif;padding:24px;line-height:1.5}" +
+            "h1,h2,h3{color:#e6c86e}img{max-width:100%;border-radius:10px}strong{color:#c9a227}",
+          { raw: true }
+        );
+
+        // Libreria media: Decap non marca la card selezionata con una classe
+        // stabile, le cambia solo la classe CSS generata (hash), la cui regola
+        // ha il bordo blu invece che grigio. Si legge quella regola (sempre
+        // allineata a ciò che Decap ha appena disegnato) e si aggiunge una
+        // classe nostra, a cui è legato il bagliore oro.
+        var UNSELECTED_BORDER = "rgb(223, 223, 227)";
+        var cardClassSelected = {};
+        function cardClassIsSelected(cls) {
+          if (cls in cardClassSelected) return cardClassSelected[cls];
+          var found = null;
+          for (var i = 0; i < document.styleSheets.length && found === null; i++) {
+            var rules;
+            try { rules = document.styleSheets[i].cssRules; } catch (e) { continue; }
+            for (var j = 0; j < rules.length; j++) {
+              if (rules[j].selectorText === "." + cls) {
+                found = rules[j].style.borderTopColor !== UNSELECTED_BORDER;
+                break;
+              }
+            }
+          }
+          // Regola non ancora inserita: non si memorizza, si riprova al giro dopo.
+          if (found !== null) cardClassSelected[cls] = found;
+          return !!found;
+        }
+        function markSelectedCards() {
+          if (!document.querySelector('[class*="StyledModal"]')) return;
+          Array.prototype.forEach.call(document.querySelectorAll('[class*="-Card "], [class$="-Card"]'), function (card) {
+            var cls = Array.prototype.find.call(card.classList, function (c) { return c.indexOf("css-") === 0 && /-Card$/.test(c); });
+            var selected = !!cls && cardClassIsSelected(cls);
+            if (card.classList.contains("ng-card-selected") !== selected) card.classList.toggle("ng-card-selected", selected);
+          });
+        }
+        new MutationObserver(markSelectedCards).observe(document.body, {
+          subtree: true,
+          childList: true,
+          attributes: true,
+          attributeFilter: ["class"],
+        });
+
+        CMS.registerWidget("ng-torneo", TorneoControl);
+        CMS.registerWidget("ng-dettagli", DettagliControl);
+        CMS.registerWidget("ng-locandine", LocandineControl);
+        CMS.registerWidget("ng-series", SeriesControl);
+        CMS.registerWidget("ng-descrizione", DescrizioneControl);
+        CMS.registerWidget("ng-serie-info", SerieInfoControl);
+        CMS.registerWidget("ng-serie-dettagli", SerieDettagliControl);
+        CMS.registerWidget("ng-news-info", NewsInfoControl);
+        CMS.registerWidget("ng-news-dettagli", NewsDettagliControl);
+        CMS.registerWidget("ng-news-testo", NewsTestoControl);
+        CMS.registerWidget("ng-classifica-info", ClassificaInfoControl);
+        CMS.registerWidget("ng-classifica-righe", StandingsControl);
+      })();
+    </script>
   </body>
 </html>

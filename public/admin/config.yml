@@ -38,49 +38,28 @@ collections:
     slug: "{{fields.torneo.year}}-{{fields.torneo.month}}-{{fields.torneo.day}}-{{slug}}"
     summary: "{{fields.torneo.title}} — {{fields.torneo.day}}/{{fields.torneo.month}}/{{fields.torneo.year}}"
     identifier_field: "torneo.title"
+    # Form tornei: niente anteprima, sezioni disegnate da widget personalizzati
+    # (registrati in public/admin/index.html) disposti a griglia. L'ordine qui
+    # sotto è l'ordine di visualizzazione.
+    editor:
+      preview: false
     fields:
-      - label: "Locandine (una o più immagini, mostrate nell'ordine in cui vengono aggiunte)"
-        name: "images"
-        widget: "list"
-        required: false
-        default: ["/eventi/placeholder-torneo.svg"]
-        field: { label: "Immagine", name: "image", widget: "image" }
-
-      - label: "🃏 Torneo"
+      # I sotto-campi non vengono disegnati (lo fa il widget), ma servono a
+      # Decap per trovare "torneo.title" (identifier_field) quando genera il
+      # nome del file e il riepilogo nella lista.
+      - label: "NOME E DATA"
         name: "torneo"
-        widget: "object"
+        widget: "ng-torneo"
         fields:
-          - { label: "Nome del torneo", name: "title", widget: "string" }
-          - { label: "Giorno (GG)", name: "day", widget: "string", pattern: ["^(0[1-9]|[12]\\d|3[01])$", "Formato GG, es. 05"] }
-          - { label: "Mese (MM)", name: "month", widget: "string", pattern: ["^(0[1-9]|1[0-2])$", "Formato MM, es. 09"] }
-          - { label: "Anno (AAAA)", name: "year", widget: "string", pattern: ["^\\d{4}$", "Formato AAAA, es. 2026"] }
-          - { label: "Orario (HH:MM)", name: "time", widget: "string", pattern: ["^([01]\\d|2[0-3]):[0-5]\\d$", "Formato HH:MM, es. 20:00"] }
-
-      - label: "🏆 Serie e fase"
-        name: "serie"
-        widget: "object"
-        required: false
-        fields:
-          - label: "Serie di appartenenza"
-            name: "seriesSlug"
-            widget: "relation"
-            collection: "serie"
-            search_fields: ["informazioni.title"]
-            value_field: "slug"
-            display_fields: ["informazioni.title"]
-            required: false
-          - { label: "Fase/flight (es. Day 1A, Final Day)", name: "phase", widget: "string", required: false }
-
-      - label: "💰 Dettagli economici e di gioco"
-        name: "dettagli"
-        widget: "object"
-        fields:
-          - { label: "Buy-in (euro)", name: "buyIn", widget: "number", value_type: "float" }
-          - { label: "Montepremi garantito (euro)", name: "guaranteed", widget: "number", value_type: "float", required: false }
-          - { label: "Stack iniziale (chips)", name: "startingStack", widget: "number", value_type: "int", required: false }
-          - { label: "Durata di un livello (minuti)", name: "levelDurationMinutes", widget: "number", value_type: "int", required: false }
-
-      - { label: "Descrizione", name: "description", widget: "text", required: false }
+          - { label: "Nome", name: "title", widget: "string" }
+          - { label: "Giorno", name: "day", widget: "string" }
+          - { label: "Mese", name: "month", widget: "string" }
+          - { label: "Anno", name: "year", widget: "string" }
+          - { label: "Orario", name: "time", widget: "string" }
+      - { label: "DETTAGLI", name: "dettagli", widget: "ng-dettagli" }
+      - { label: "LOCANDINA", name: "images", widget: "ng-locandine", required: false }
+      - { label: "SERIES", name: "serie", widget: "ng-series", required: false }
+      - { label: "DESCRIZIONE", name: "description", widget: "ng-descrizione", required: false }
 
   - name: "serie"
     label: "Serie / Festival"
@@ -91,39 +70,23 @@ collections:
     slug: "{{slug}}"
     summary: "{{fields.informazioni.title}} — {{fields.informazioni.inizio.day}}/{{fields.informazioni.inizio.month}}/{{fields.informazioni.inizio.year}}"
     identifier_field: "informazioni.title"
+    # Stessa impostazione del form tornei: niente anteprima, sezioni disegnate
+    # dai widget personalizzati di public/admin/index.html, disposte a griglia.
+    editor:
+      preview: false
     fields:
-      - label: "📋 Informazioni"
+      # Sotto-campi solo descrittivi: servono a Decap per trovare
+      # "informazioni.title" (nome del file e riepilogo in lista).
+      - label: "NOME E DATE"
         name: "informazioni"
-        widget: "object"
+        widget: "ng-serie-info"
         fields:
-          - { label: "Nome della serie", name: "title", widget: "string" }
-          - label: "Data inizio"
-            name: "inizio"
-            widget: "object"
-            fields:
-              - { label: "Giorno (GG)", name: "day", widget: "string", pattern: ["^(0[1-9]|[12]\\d|3[01])$", "Formato GG, es. 05"] }
-              - { label: "Mese (MM)", name: "month", widget: "string", pattern: ["^(0[1-9]|1[0-2])$", "Formato MM, es. 09"] }
-              - { label: "Anno (AAAA)", name: "year", widget: "string", pattern: ["^\\d{4}$", "Formato AAAA, es. 2026"] }
-          - label: "Data fine (Final Day)"
-            name: "fine"
-            widget: "object"
-            fields:
-              - { label: "Giorno (GG)", name: "day", widget: "string", pattern: ["^(0[1-9]|[12]\\d|3[01])$", "Formato GG, es. 18"] }
-              - { label: "Mese (MM)", name: "month", widget: "string", pattern: ["^(0[1-9]|1[0-2])$", "Formato MM, es. 09"] }
-              - { label: "Anno (AAAA)", name: "year", widget: "string", pattern: ["^\\d{4}$", "Formato AAAA, es. 2026"] }
-          - { label: "Montepremi garantito complessivo (euro)", name: "guaranteed", widget: "number", value_type: "float", required: false }
-
-      - label: "🖼️ Media"
-        name: "media"
-        widget: "object"
-        fields:
-          - label: "Immagini (una o più, mostrate nell'ordine in cui vengono aggiunte)"
-            name: "images"
-            widget: "list"
-            required: false
-            default: ["/eventi/placeholder-torneo.svg"]
-            field: { label: "Immagine", name: "image", widget: "image" }
-          - { label: "Descrizione", name: "description", widget: "text" }
+          - { label: "Nome", name: "title", widget: "string" }
+          - { label: "Inizio", name: "inizio", widget: "object", fields: [{ label: "Giorno", name: "day", widget: "string" }, { label: "Mese", name: "month", widget: "string" }, { label: "Anno", name: "year", widget: "string" }] }
+          - { label: "Fine", name: "fine", widget: "object", fields: [{ label: "Giorno", name: "day", widget: "string" }, { label: "Mese", name: "month", widget: "string" }, { label: "Anno", name: "year", widget: "string" }] }
+      - { label: "DETTAGLI", name: "dettagli", widget: "ng-serie-dettagli", required: false }
+      - { label: "LOCANDINA", name: "images", widget: "ng-locandine", required: false }
+      - { label: "DESCRIZIONE", name: "description", widget: "ng-descrizione" }
 
   - name: "news"
     label: "News"
@@ -131,20 +94,27 @@ collections:
     extension: "json"
     format: "json"
     create: true
-    slug: "{{fields.date}}-{{slug}}"
-    identifier_field: title
+    slug: "{{fields.notizia.year}}-{{fields.notizia.month}}-{{fields.notizia.day}}-{{slug}}"
+    summary: "{{fields.notizia.title}} — {{fields.notizia.day}}/{{fields.notizia.month}}/{{fields.notizia.year}}"
+    identifier_field: "notizia.title"
+    # Stessa impostazione di tornei e series: niente anteprima, sezioni
+    # disegnate dai widget personalizzati di public/admin/index.html.
+    editor:
+      preview: false
     fields:
-      - { label: "Titolo", name: "title", widget: "string" }
-      - { label: "Data", name: "date", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false }
-      - { label: "Categoria", name: "category", widget: "select", options: ["Risultati", "Comunicato", "Evento speciale"] }
-      - { label: "Anteprima (excerpt)", name: "excerpt", widget: "text" }
-      - { label: "Paragrafi", name: "body", widget: "list", field: { label: "Paragrafo", name: "paragraph", widget: "text" } }
-      - label: "Immagini (una o più, mostrate nell'ordine in cui vengono aggiunte)"
-        name: "images"
-        widget: "list"
-        required: false
-        default: ["/news/placeholder-news.svg"]
-        field: { label: "Immagine", name: "image", widget: "image" }
+      # Sotto-campi solo descrittivi: servono a Decap per trovare
+      # "notizia.title" (nome del file e riepilogo in lista).
+      - label: "TITOLO E DATA"
+        name: "notizia"
+        widget: "ng-news-info"
+        fields:
+          - { label: "Titolo", name: "title", widget: "string" }
+          - { label: "Giorno", name: "day", widget: "string" }
+          - { label: "Mese", name: "month", widget: "string" }
+          - { label: "Anno", name: "year", widget: "string" }
+      - { label: "DETTAGLI", name: "dettagli", widget: "ng-news-dettagli" }
+      - { label: "IMMAGINI", name: "images", widget: "ng-locandine", required: false, default_image: "/news/placeholder-news.svg" }
+      - { label: "TESTO", name: "body", widget: "ng-news-testo" }
 
   - name: "classifiche"
     label: "Classifiche"
@@ -153,16 +123,18 @@ collections:
     format: "json"
     create: true
     slug: "{{slug}}"
-    identifier_field: title
+    summary: "{{fields.classifica.title}} — aggiornata al {{fields.classifica.day}}/{{fields.classifica.month}}/{{fields.classifica.year}}"
+    identifier_field: "classifica.title"
+    editor:
+      preview: false
     fields:
-      - { label: "Titolo classifica", name: "title", widget: "string" }
-      - { label: "Serie in corso", name: "seriesActive", widget: "boolean", default: true }
-      - { label: "Ultimo aggiornamento", name: "updatedAt", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false }
-      - label: "Classifica"
-        name: "standings"
-        widget: "list"
+      - label: "NOME E DATA"
+        name: "classifica"
+        widget: "ng-classifica-info"
         fields:
-          - { label: "Posizione", name: "position", widget: "number", value_type: "int" }
-          - { label: "Nome giocatore", name: "playerName", widget: "string" }
-          - { label: "Punti", name: "points", widget: "number", value_type: "int" }
-          - { label: "Tornei giocati", name: "events", widget: "number", value_type: "int", default: 0 }
+          - { label: "Titolo", name: "title", widget: "string" }
+          - { label: "Giorno", name: "day", widget: "string" }
+          - { label: "Mese", name: "month", widget: "string" }
+          - { label: "Anno", name: "year", widget: "string" }
+          - { label: "In corso", name: "seriesActive", widget: "boolean" }
+      - { label: "CLASSIFICA", name: "standings", widget: "ng-classifica-righe" }

@@ -3,6 +3,8 @@ import { slugify, dateSlugSuffix } from "@/lib/slug";
 import { dayFieldSchema, monthFieldSchema, yearFieldSchema, isValidCalendarDate } from "@/lib/schemas/date-parts";
 import { optionalNumber } from "@/lib/schemas/optional-number";
 
+export const DEFAULT_EVENT_IMAGE = "/eventi/placeholder-torneo.svg";
+
 const torneoGroupSchema = z
   .object({
     title: z
@@ -71,11 +73,13 @@ const eventShape = z.object({
     .transform((value) => (value && value.trim().length > 0 ? value : null)),
 
   // Una o più locandine: mostrate incolonnate, nell'ordine in cui sono
-  // state aggiunte, nella scheda torneo.
+  // state aggiunte, nella scheda torneo. Il pannello salva una lista vuota
+  // quando non ci sono locandine personalizzate: in quel caso si usa quella
+  // di default (che il pannello non mostra né salva mai).
   images: z
     .array(z.string())
-    .min(1, "Serve almeno un'immagine")
-    .default(["/eventi/placeholder-torneo.svg"]),
+    .default([])
+    .transform((list) => (list.length > 0 ? list : [DEFAULT_EVENT_IMAGE])),
 });
 
 export const eventSchema = eventShape.transform((data) => {

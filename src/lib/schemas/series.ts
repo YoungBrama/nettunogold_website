@@ -3,6 +3,8 @@ import { slugify } from "@/lib/slug";
 import { dayFieldSchema, monthFieldSchema, yearFieldSchema, isValidCalendarDate, dateFromParts } from "@/lib/schemas/date-parts";
 import { optionalNumber } from "@/lib/schemas/optional-number";
 
+export const DEFAULT_SERIES_IMAGE = "/eventi/placeholder-torneo.svg";
+
 // Una Serie rappresenta un festival/circuito multiday (es. "PGS Spring Edition",
 // "The Gladiator"): raccoglie più tornei/flight (vedi campo "seriesSlug" e
 // "phase" in event.ts) sotto un unico filone, con la propria pagina dedicata.
@@ -19,6 +21,8 @@ const dateGroupSchema = (label: string) =>
       path: ["day"],
     });
 
+// Struttura a sezioni, una per ogni riquadro del pannello CMS (NOME E DATE,
+// DETTAGLI, LOCANDINA, DESCRIZIONE), come per i tornei singoli.
 const informazioniGroupSchema = z.object({
   title: z
     .string("Il titolo della serie è obbligatorio")
@@ -26,21 +30,10 @@ const informazioniGroupSchema = z.object({
 
   inizio: dateGroupSchema("data di inizio"),
   fine: dateGroupSchema("data di fine"),
-
-  guaranteed: optionalNumber(z.number("Il garantito complessivo deve essere un numero (in euro)").nonnegative()),
 });
 
-const mediaGroupSchema = z.object({
-  // Una o più immagini: mostrate incolonnate, nell'ordine in cui sono
-  // state aggiunte, nella pagina della serie.
-  images: z
-    .array(z.string())
-    .min(1, "Serve almeno un'immagine")
-    .default(["/eventi/placeholder-torneo.svg"]),
-
-  description: z
-    .string("La descrizione è obbligatoria")
-    .min(10, "La descrizione deve avere almeno 10 caratteri"),
+const dettagliGroupSchema = z.object({
+  guaranteed: optionalNumber(z.number("Il garantito complessivo deve essere un numero (in euro)").nonnegative()),
 });
 
 const seriesShape = z.object({
@@ -56,7 +49,19 @@ const seriesShape = z.object({
     .default(null),
 
   informazioni: informazioniGroupSchema,
-  media: mediaGroupSchema,
+  dettagli: dettagliGroupSchema.default({ guaranteed: null }),
+
+  // Una o più locandine, mostrate incolonnate nell'ordine in cui sono state
+  // aggiunte. Il pannello salva una lista vuota quando non ce ne sono: in
+  // quel caso si usa quella di default (che il pannello non mostra mai).
+  images: z
+    .array(z.string())
+    .default([])
+    .transform((list) => (list.length > 0 ? list : [DEFAULT_SERIES_IMAGE])),
+
+  description: z
+    .string("La descrizione è obbligatoria")
+    .min(10, "La descrizione deve avere almeno 10 caratteri"),
 });
 
 export const seriesSchema = seriesShape.transform((data) => {
@@ -66,9 +71,9 @@ export const seriesSchema = seriesShape.transform((data) => {
   return {
     title: data.informazioni.title,
     slug: data.slug ?? `${slugify(data.informazioni.title)}-${startDate.slice(0, 4)}`,
-    description: data.media.description,
-    images: data.media.images,
-    guaranteed: data.informazioni.guaranteed,
+    description: data.description,
+    images: data.images,
+    guaranteed: data.dettagli.guaranteed,
     startDate,
     endDate,
   };
