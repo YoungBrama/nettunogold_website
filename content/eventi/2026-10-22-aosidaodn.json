@@ -1,0 +1,18 @@
+{
+  "torneo": {
+    "title": "aosidaodn",
+    "day": "22",
+    "month": "10",
+    "year": "2026",
+    "time": "10:00"
+  },
+  "dettagli": {
+    "buyIn": 1,
+    "guaranteed": 1,
+    "startingStack": 1,
+    "levelDurationMinutes": 1
+  },
+  "images": [
+    "/eventi/placeholder-torneo.svg"
+  ]
+}
