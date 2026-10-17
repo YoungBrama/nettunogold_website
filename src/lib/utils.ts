@@ -22,6 +22,16 @@ export function formatDateShortIt(dateISO: string): string {
   return format(date, "d MMM", { locale: it });
 }
 
+export function formatDayNumber(dateISO: string): string {
+  const date = new Date(`${dateISO}T00:00:00`);
+  return format(date, "d", { locale: it });
+}
+
+export function formatMonthFullIt(dateISO: string): string {
+  const date = new Date(`${dateISO}T00:00:00`);
+  return format(date, "MMMM", { locale: it }).toUpperCase();
+}
+
 export function formatNumberIt(value: number): string {
   const rounded = Math.round(value);
   const negative = rounded < 0;
