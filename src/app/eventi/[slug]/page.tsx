@@ -134,7 +134,7 @@ export default async function EventoPage({
           {event.guaranteed ? (
             <div className="rounded-lg border border-gold/40 bg-gold/10 p-5 text-center">
               <div className="text-xs uppercase tracking-widest text-gold">Montepremi garantito</div>
-              <div className="mt-1 font-display text-3xl text-gold-light">
+              <div className="mt-1 font-sans text-3xl font-bold text-gold-light">
                 {formatNumberIt(event.guaranteed)}
               </div>
             </div>

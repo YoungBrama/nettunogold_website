@@ -44,6 +44,10 @@ collections:
     editor:
       preview: false
     fields:
+      # Slug esplicito già presente nel file (es. link dei flight alla serie):
+      # campo nascosto, serve solo a non perderlo quando si salva dal pannello.
+      # Nei contenuti nuovi resta vuoto e il sito lo genera dal titolo.
+      - { label: "Slug", name: "slug", widget: "hidden", required: false }
       # I sotto-campi non vengono disegnati (lo fa il widget), ma servono a
       # Decap per trovare "torneo.title" (identifier_field) quando genera il
       # nome del file e il riepilogo nella lista.
@@ -75,6 +79,10 @@ collections:
     editor:
       preview: false
     fields:
+      # Slug esplicito già presente nel file (es. link dei flight alla serie):
+      # campo nascosto, serve solo a non perderlo quando si salva dal pannello.
+      # Nei contenuti nuovi resta vuoto e il sito lo genera dal titolo.
+      - { label: "Slug", name: "slug", widget: "hidden", required: false }
       # Sotto-campi solo descrittivi: servono a Decap per trovare
       # "informazioni.title" (nome del file e riepilogo in lista).
       - label: "NOME E DATE"
@@ -86,7 +94,7 @@ collections:
           - { label: "Fine", name: "fine", widget: "object", fields: [{ label: "Giorno", name: "day", widget: "string" }, { label: "Mese", name: "month", widget: "string" }, { label: "Anno", name: "year", widget: "string" }] }
       - { label: "DETTAGLI", name: "dettagli", widget: "ng-serie-dettagli", required: false }
       - { label: "LOCANDINA", name: "images", widget: "ng-locandine", required: false }
-      - { label: "DESCRIZIONE", name: "description", widget: "ng-descrizione" }
+      - { label: "DESCRIZIONE", name: "description", widget: "ng-descrizione", required: false }
 
   - name: "news"
     label: "News"
@@ -102,6 +110,10 @@ collections:
     editor:
       preview: false
     fields:
+      # Slug esplicito già presente nel file (es. link dei flight alla serie):
+      # campo nascosto, serve solo a non perderlo quando si salva dal pannello.
+      # Nei contenuti nuovi resta vuoto e il sito lo genera dal titolo.
+      - { label: "Slug", name: "slug", widget: "hidden", required: false }
       # Sotto-campi solo descrittivi: servono a Decap per trovare
       # "notizia.title" (nome del file e riepilogo in lista).
       - label: "TITOLO E DATA"
@@ -128,6 +140,10 @@ collections:
     editor:
       preview: false
     fields:
+      # Slug esplicito già presente nel file (es. link dei flight alla serie):
+      # campo nascosto, serve solo a non perderlo quando si salva dal pannello.
+      # Nei contenuti nuovi resta vuoto e il sito lo genera dal titolo.
+      - { label: "Slug", name: "slug", widget: "hidden", required: false }
       - label: "NOME E DATA"
         name: "classifica"
         widget: "ng-classifica-info"

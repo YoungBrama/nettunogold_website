@@ -3,7 +3,7 @@ import Image from "next/image";
 import { CalendarDays, Clock, Coins, Layers } from "lucide-react";
 import type { Event } from "@/lib/schemas/event";
 import { Badge } from "@/components/ui/Badge";
-import { formatDateIt, formatEuro, formatNumberIt } from "@/lib/utils";
+import { formatDateIt, formatNumberIt } from "@/lib/utils";
 
 // Nota: la card non risolve da sola il titolo della serie (event.seriesSlug)
 // perché è usata anche dentro componenti client (calendario di
@@ -61,7 +61,7 @@ export function EventCard({
         <div className="mt-1 grid grid-cols-2 gap-3 border-t border-border-subtle pt-3 text-sm">
           <div>
             <div className="text-muted text-xs uppercase tracking-wide">Buy-in</div>
-            <div className="text-foreground font-medium">{formatEuro(event.buyIn)}</div>
+            <div className="text-foreground font-medium">{formatNumberIt(event.buyIn)}</div>
           </div>
           {event.startingStack ? (
             <div>
@@ -77,7 +77,7 @@ export function EventCard({
               <div className="text-muted text-xs uppercase tracking-wide">Garantito</div>
               <div className="text-gold-light font-semibold flex items-center gap-1">
                 <Coins size={14} />
-                {formatEuro(event.guaranteed)}
+                {formatNumberIt(event.guaranteed)}
               </div>
             </div>
           ) : null}

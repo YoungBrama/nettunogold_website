@@ -59,9 +59,12 @@ const seriesShape = z.object({
     .default([])
     .transform((list) => (list.length > 0 ? list : [DEFAULT_SERIES_IMAGE])),
 
+  // Facoltativa, come per i tornei singoli: vuota = nessuna descrizione.
   description: z
-    .string("La descrizione è obbligatoria")
-    .min(10, "La descrizione deve avere almeno 10 caratteri"),
+    .string()
+    .nullable()
+    .default(null)
+    .transform((value) => (value && value.trim().length > 0 ? value : null)),
 });
 
 export const seriesSchema = seriesShape.transform((data) => {

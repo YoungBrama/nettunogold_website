@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { CalendarRange, Coins } from "lucide-react";
 import type { Series } from "@/lib/schemas/series";
-import { formatDateIt, formatEuro } from "@/lib/utils";
+import { formatDateIt, formatNumberIt } from "@/lib/utils";
 
 export function SeriesCard({ series, flightCount }: { series: Series; flightCount: number }) {
   return (
@@ -27,7 +27,9 @@ export function SeriesCard({ series, flightCount }: { series: Series; flightCoun
         <h3 className="font-sans text-lg font-bold sm:text-xl text-foreground group-hover:text-gold-light transition-colors">
           {series.title}
         </h3>
-        <p className="line-clamp-2 text-sm text-muted">{series.description}</p>
+        {series.description ? (
+          <p className="line-clamp-2 text-sm text-muted">{series.description}</p>
+        ) : null}
 
         <div className="mt-1 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-border-subtle pt-3 text-sm">
           <span className="flex items-center gap-1.5 text-muted">
@@ -37,7 +39,7 @@ export function SeriesCard({ series, flightCount }: { series: Series; flightCoun
           {series.guaranteed ? (
             <span className="flex items-center gap-1.5 font-semibold text-gold-light">
               <Coins size={14} />
-              {formatEuro(series.guaranteed)} garantiti
+              {formatNumberIt(series.guaranteed)} garantiti
             </span>
           ) : null}
         </div>

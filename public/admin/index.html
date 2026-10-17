@@ -1051,13 +1051,6 @@
         // ---------------- DESCRIZIONE ----------------
         var DescrizioneControl = createClass({
           componentDidMount: scheduleLayout,
-          // Facoltativa per i tornei, obbligatoria per le series (config.yml).
-          isValid: function () {
-            if (this.props.field.get("required") === false) return true;
-            var text = typeof this.props.value === "string" ? this.props.value.trim() : "";
-            if (text.length < 10) return invalid("La descrizione deve avere almeno 10 caratteri");
-            return true;
-          },
           render: function () {
             var self = this;
             return section(

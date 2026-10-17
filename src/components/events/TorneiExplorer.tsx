@@ -7,7 +7,7 @@ import { ChevronLeft, ChevronRight, CalendarDays, Clock, Coins, List } from "luc
 import { addMonths, subMonths } from "date-fns";
 import type { Event } from "@/lib/schemas/event";
 import { buildMonthGrid, isoDate, monthLabel, isSameMonth, isSameDay } from "@/lib/calendar";
-import { cn, formatDateIt, formatEuro, formatDayNumber, formatMonthFullIt } from "@/lib/utils";
+import { cn, formatDateIt, formatDayNumber, formatMonthFullIt, formatNumberIt } from "@/lib/utils";
 
 export function TorneiExplorer({ events }: { events: Event[] }) {
   const [view, setView] = useState<"calendario" | "lista">("lista");
@@ -149,7 +149,7 @@ export function TorneiExplorer({ events }: { events: Event[] }) {
                   <span className="font-medium text-foreground">{event.title}</span>
                   <div className="flex items-center gap-4 text-sm text-muted">
                     <span>{event.time}</span>
-                    <span>{formatEuro(event.buyIn)}</span>
+                    <span>{formatNumberIt(event.buyIn)}</span>
                   </div>
                 </Link>
               ))}
@@ -228,7 +228,7 @@ function TorneoRow({ event }: { event: Event }) {
         <div className="flex flex-wrap items-center gap-2.5">
           <div className="flex flex-col items-end rounded-xl border border-border-subtle bg-background/60 px-3.5 py-2 transition-colors group-hover:border-gold/30">
             <span className="text-[10px] font-medium uppercase tracking-widest text-muted">Buy-in</span>
-            <span className="text-lg font-bold text-foreground">{formatEuro(event.buyIn)}</span>
+            <span className="text-lg font-bold text-foreground">{formatNumberIt(event.buyIn)}</span>
           </div>
 
           {event.guaranteed ? (
@@ -241,7 +241,7 @@ function TorneoRow({ event }: { event: Event }) {
                 <Coins size={11} /> Garantito
               </span>
               <span className="relative text-lg font-bold text-gold-gradient">
-                {formatEuro(event.guaranteed)}
+                {formatNumberIt(event.guaranteed)}
               </span>
             </div>
           ) : null}

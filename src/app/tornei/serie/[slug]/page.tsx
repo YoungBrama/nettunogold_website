@@ -23,12 +23,14 @@ export async function generateMetadata({
   const series = getSeriesBySlug(slug);
   if (!series) return {};
 
+  const description = series.description ?? series.title;
+
   return {
     title: series.title,
-    description: series.description,
+    description,
     openGraph: {
       title: series.title,
-      description: series.description,
+      description,
       images: series.images.map((url) => ({ url })),
     },
   };
@@ -89,7 +91,7 @@ export default async function SeriePage({
               <div className="text-xs uppercase tracking-widest text-gold">
                 Montepremi garantito complessivo
               </div>
-              <div className="mt-1 font-display text-3xl text-gold-light">
+              <div className="mt-1 font-sans text-3xl font-bold text-gold-light">
                 {formatNumberIt(series.guaranteed)}
               </div>
             </div>
@@ -142,9 +144,11 @@ export default async function SeriePage({
             )}
           </div>
 
-          <p className="text-foreground/85 leading-relaxed whitespace-pre-line">
-            {series.description}
-          </p>
+          {series.description ? (
+            <p className="text-foreground/85 leading-relaxed whitespace-pre-line">
+              {series.description}
+            </p>
+          ) : null}
 
           <div className="flex justify-center">
             <Button href="/tornei" size="lg">
